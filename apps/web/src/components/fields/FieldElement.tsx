@@ -28,19 +28,20 @@ export const FieldElement: React.FC<FieldElementProps> = ({
 }) => {
   const radioGroupId = useId();
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-  ) => {
-    if (!onChange) return;
-    if (element.type === 'checkbox') {
-      onChange((e.target as HTMLInputElement).checked);
-    } else if (element.type === 'file') {
-      const files = (e.target as HTMLInputElement).files;
-      onChange(files && files.length > 0 ? files[0].name : '');
-    } else {
-      onChange(e.target.value);
-    }
-  };
+  const handleChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      if (!onChange) return;
+      if (element.type === 'checkbox') {
+        onChange((e.target as HTMLInputElement).checked);
+      } else if (element.type === 'file') {
+        const files = (e.target as HTMLInputElement).files;
+        onChange(files && files.length > 0 ? files[0].name : '');
+      } else {
+        onChange(e.target.value);
+      }
+    },
+    [onChange, element.type],
+  );
 
   // Validation Status & Feedback
   let validationStatus: 'valid' | 'invalid' | null = null;
