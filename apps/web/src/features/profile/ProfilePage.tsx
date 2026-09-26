@@ -121,9 +121,6 @@ export const ProfilePage: React.FC = () => {
         })
       : '—';
   }, [user.createdAt]);
-        day: 'numeric',
-      })
-    : 'N/A';
 
   const isAdmin = user.role === 'ADMIN';
   const isSuspended = user.status === UserStatus.SUSPENDED;
