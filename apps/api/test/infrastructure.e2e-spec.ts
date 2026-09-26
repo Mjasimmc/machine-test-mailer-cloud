@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import request from 'supertest';
+const request = require('supertest');
 import { AppModule } from '../src/app.module';
 
 describe('Scalable Production Infrastructure (e2e)', () => {
