@@ -70,13 +70,6 @@ export const DataSection: React.FC<DataSectionProps> = ({ form }) => {
   useEffect(() => {
     loadData();
   }, [loadData]);
-        hour: 'numeric',
-        minute: '2-digit',
-      });
-    } catch {
-      return dateStr;
-    }
-  };
 
   // Filtered and Sorted rows
   const filteredAndSortedRows = useMemo(() => {
