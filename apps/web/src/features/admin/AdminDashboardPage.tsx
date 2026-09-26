@@ -14,32 +14,33 @@ export const AdminDashboardPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadStats() {
-      try {
-        const data = await adminService.getStats();
-        if (isMounted) {
-          setStats(data);
-        }
-      } catch (err: any) {
-        if (isMounted) {
-          setError(err.message || 'Failed to load dashboard statistics');
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+  const loadStats = React.useCallback(async (isMounted = true) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await adminService.getStats();
+      if (isMounted) {
+        setStats(data);
+      }
+    } catch (err: any) {
+      if (isMounted) {
+        setError(err.message || 'Failed to load dashboard statistics');
+      }
+    } finally {
+      if (isMounted) {
+        setLoading(false);
       }
     }
+  }, []);
 
-    loadStats();
+  useEffect(() => {
+    let isMounted = true;
+    loadStats(isMounted);
 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [loadStats]);
 
   return (
     <ContentContainer>
