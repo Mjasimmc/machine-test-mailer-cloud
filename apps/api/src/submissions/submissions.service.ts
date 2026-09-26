@@ -287,6 +287,7 @@ export class SubmissionsService {
     const allVersions = await this.formVersionModel
       .find({ formId: form._id })
       .sort({ versionNumber: 1 })
+      .lean()
       .exec();
 
     const versionMap = new Map<string, number>();
