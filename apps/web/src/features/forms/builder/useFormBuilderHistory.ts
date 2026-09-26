@@ -33,9 +33,9 @@ export function useFormBuilderHistory(initialState: FormSnapshot) {
       if (updated.length > 50) {
         updated.shift();
       }
+      setCurrentIndex(updated.length - 1);
       return updated;
     });
-    setCurrentIndex((prev) => Math.min(prev + 1, 49));
   }, [currentIndex]);
 
   const undo = useCallback((): FormSnapshot | null => {
