@@ -494,4 +494,102 @@ export class SubmissionsService {
       rows,
     };
   }
+
+  /**
+   * Escape and sanitize field values to prevent CSV formula injection (CSV Injection / DDE)
+   * and conform strictly to RFC 4180 standards.
+   */
+  private sanitizeCsvCell(raw: any): string {
+    if (raw === undefined || raw === null) {
+      return '';
+    }
+
+    let str = typeof raw === 'object' ? JSON.stringify(raw) : String(raw);
+
+    // Prevent CSV formula injection in spreadsheet applications (Excel, LibreOffice, Google Sheets)
+    const dangerousPrefixes = ['=', '+', '-', '@', '\t', '\r'];
+    if (str.length > 0 && dangerousPrefixes.some((p) => str.startsWith(p))) {
+      str = `'${str}`;
+    }
+
+    // RFC 4180 quoting
+    if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+
+    return str;
+  }
+
+  async exportCsv(
+    userId: string,
+    formId: string,
+    tenantId?: string,
+    query?: GetFormDataQueryDto,
+  ): Promise<{ filename: string; content: string }> {
+    // Retrieve complete unpaginated dataset
+    const dataView = await this.getDataView(userId, formId, tenantId, {
+      ...query,
+      page: undefined,
+      limit: undefined,
+    });
+
+    const headers = ['Submission ID', 'Submitted At', 'Version Number', ...dataView.columns.map((c) => c.label || c.id)];
+    const csvLines: string[] = [headers.map((h) => this.sanitizeCsvCell(h)).join(',')];
+
+    for (const row of dataView.rows) {
+      const lineCells = [
+        row.id,
+        row.submittedAt,
+        String(row.versionNumber),
+        ...dataView.columns.map((col) => row.data[col.id]),
+      ];
+      csvLines.push(lineCells.map((val) => this.sanitizeCsvCell(val)).join(','));
+    }
+
+    const sanitizedFormName = (dataView.formName || 'form')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '_')
+      .substring(0, 30);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `${sanitizedFormName}_submissions_${timestamp}.csv`;
+
+    // Prepend UTF-8 BOM (\uFEFF) for Excel UTF-8 compatibility
+    const content = '\uFEFF' + csvLines.join('\r\n');
+
+    return { filename, content };
+  }
+
+  async exportJson(
+    userId: string,
+    formId: string,
+    tenantId?: string,
+    query?: GetFormDataQueryDto,
+  ): Promise<{ filename: string; data: any }> {
+    const dataView = await this.getDataView(userId, formId, tenantId, {
+      ...query,
+      page: undefined,
+      limit: undefined,
+    });
+
+    const sanitizedFormName = (dataView.formName || 'form')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '_')
+      .substring(0, 30);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `${sanitizedFormName}_submissions_${timestamp}.json`;
+
+    return {
+      filename,
+      data: {
+        exportedAt: new Date().toISOString(),
+        formId: dataView.formId,
+        formName: dataView.formName,
+        tenantId: dataView.tenantId,
+        totalCount: dataView.totalCount,
+        columns: dataView.columns,
+        submissions: dataView.rows,
+      },
+    };
+  }
 }
+

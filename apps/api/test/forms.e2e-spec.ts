@@ -828,5 +828,33 @@ describe('Form Management & Public Form Flow (e2e)', () => {
       expect(dataRes.body.totalPages).toBeGreaterThanOrEqual(2);
       expect(dataRes.body.rows.length).toBeLessThanOrEqual(2);
     });
+
+    it('should export submissions as CSV with UTF-8 BOM and RFC4180 escaping on GET /forms/:id/export/csv', async () => {
+      const csvRes = await request(app.getHttpServer())
+        .get(`/forms/${hierarchicalFormId}/export/csv`)
+        .set('Authorization', `Bearer ${user1Token}`)
+        .expect(200);
+
+      expect(csvRes.headers['content-type']).toContain('text/csv');
+      expect(csvRes.headers['content-disposition']).toContain('attachment');
+      expect(csvRes.text).toContain('Submission ID');
+      expect(csvRes.text).toContain('Submitted At');
+      expect(csvRes.text).toContain('Version Number');
+    });
+
+    it('should export submissions as JSON payload on GET /forms/:id/export/json', async () => {
+      const jsonRes = await request(app.getHttpServer())
+        .get(`/forms/${hierarchicalFormId}/export/json`)
+        .set('Authorization', `Bearer ${user1Token}`)
+        .expect(200);
+
+      expect(jsonRes.headers['content-type']).toContain('application/json');
+      expect(jsonRes.headers['content-disposition']).toContain('attachment');
+      expect(jsonRes.body.formId).toBe(hierarchicalFormId);
+      expect(jsonRes.body.submissions).toBeDefined();
+      expect(Array.isArray(jsonRes.body.submissions)).toBe(true);
+      expect(jsonRes.body.submissions.length).toBeGreaterThan(0);
+    });
   });
 });
+

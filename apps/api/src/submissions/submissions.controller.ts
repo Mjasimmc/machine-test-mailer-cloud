@@ -6,8 +6,10 @@ import {
   Param,
   Post,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { SubmissionsService } from './submissions.service';
 import { SubmitFormDto } from '../forms/dto/submit-form.dto';
 import { FormDataViewDto, GetFormDataQueryDto, Permission } from '@saas/shared';
@@ -58,5 +60,38 @@ export class SubmissionsController {
     };
     return this.submissionsService.getDataView(userId, formId, tenantId, query);
   }
+
+  @Get('forms/:id/export/csv')
+  @UseGuards(JwtAuthGuard, ActiveUserGuard, PermissionsGuard)
+  @RequirePermissions(Permission.SUBMISSIONS_READ)
+  async exportCsv(
+    @CurrentUser('id') userId: string,
+    @CurrentTenant() tenantId: string,
+    @Param('id') formId: string,
+    @Query('versionFilter') versionFilter: string | undefined,
+    @Res() res: Response,
+  ): Promise<void> {
+    const result = await this.submissionsService.exportCsv(userId, formId, tenantId, { versionFilter });
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.status(200).send(result.content);
+  }
+
+  @Get('forms/:id/export/json')
+  @UseGuards(JwtAuthGuard, ActiveUserGuard, PermissionsGuard)
+  @RequirePermissions(Permission.SUBMISSIONS_READ)
+  async exportJson(
+    @CurrentUser('id') userId: string,
+    @CurrentTenant() tenantId: string,
+    @Param('id') formId: string,
+    @Query('versionFilter') versionFilter: string | undefined,
+    @Res() res: Response,
+  ): Promise<void> {
+    const result = await this.submissionsService.exportJson(userId, formId, tenantId, { versionFilter });
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.status(200).send(JSON.stringify(result.data, null, 2));
+  }
 }
+
 
