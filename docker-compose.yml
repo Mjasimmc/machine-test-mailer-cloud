@@ -1,0 +1,135 @@
+services:
+  # ---------------------------------------------------------------------------
+  # Global Edge Layer / Load Balancer (Nginx + Reverse Proxy + DDoS / WAF)
+  # ---------------------------------------------------------------------------
+  edge-lb:
+    image: nginx:alpine
+    container_name: saas-edge-lb
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api-1
+      - api-2
+      - web
+    networks:
+      - saas-network
+
+  # ---------------------------------------------------------------------------
+  # Web Application (React 19 + Vite 6 Single Page Application)
+  # ---------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: saas-web
+    networks:
+      - saas-network
+
+  # ---------------------------------------------------------------------------
+  # Horizontally Scaled API Instance 1
+  # ---------------------------------------------------------------------------
+  api-1:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: saas-api-1
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - TRUST_PROXY=1
+      - FRONTEND_URL=http://localhost
+      - MONGODB_URI=mongodb://mongodb:27017/saas_db
+      - REDIS_URL=redis://redis:6379
+      - VAULT_ENABLED=false
+      - JWT_SECRET=super-secure-production-jwt-signing-secret-key-replace-in-prod
+      - STORAGE_DRIVER=local
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - saas-network
+
+  # ---------------------------------------------------------------------------
+  # Horizontally Scaled API Instance 2
+  # ---------------------------------------------------------------------------
+  api-2:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: saas-api-2
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - TRUST_PROXY=1
+      - FRONTEND_URL=http://localhost
+      - MONGODB_URI=mongodb://mongodb:27017/saas_db
+      - REDIS_URL=redis://redis:6379
+      - VAULT_ENABLED=false
+      - JWT_SECRET=super-secure-production-jwt-signing-secret-key-replace-in-prod
+      - STORAGE_DRIVER=local
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - saas-network
+
+  # ---------------------------------------------------------------------------
+  # Authoritative Primary Database (MongoDB)
+  # ---------------------------------------------------------------------------
+  mongodb:
+    image: mongo:7.0
+    container_name: saas-mongodb
+    command: ["mongod", "--bind_ip_all"]
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - saas-network
+
+  # ---------------------------------------------------------------------------
+  # Distributed Shared State & Socket.IO Pub/Sub (Redis)
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7.2-alpine
+    container_name: saas-redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - saas-network
+
+  # ---------------------------------------------------------------------------
+  # Secret Management Infrastructure Boundary (HashiCorp Vault)
+  # ---------------------------------------------------------------------------
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: saas-vault
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=dev-root-token-saas-platform
+      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+    networks:
+      - saas-network
+
+  # ---------------------------------------------------------------------------
+  # S3-Compatible Object Storage (MinIO)
+  # ---------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: saas-minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadminpassword
+    volumes:
+      - minio_data:/data
+    networks:
+      - saas-network
+
+networks:
+  saas-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  redis_data:
+  minio_data:

@@ -12,3 +12,5 @@ coverage
 .pgdata
 virtual-commit-messages.md
 graphify-out/
+*.tsbuildinfo
+apps/api/prisma/
