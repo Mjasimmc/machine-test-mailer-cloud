@@ -17,6 +17,22 @@ interface VersionsSectionProps {
   onNavigateTab: (tab: FormDetailTab) => void;
 }
 
+const formatDate = (dateStr?: string) => {
+  if (!dateStr) return '—';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
 export const VersionsSection: React.FC<VersionsSectionProps> = ({
   form,
   onRefresh,
@@ -37,25 +53,11 @@ export const VersionsSection: React.FC<VersionsSectionProps> = ({
 
   const versions = form.versions || [];
   // Sort descending by version number
-  const sortedVersions = [...versions].sort((a, b) => b.versionNumber - a.versionNumber);
+  const sortedVersions = React.useMemo(() => {
+    return [...versions].sort((a, b) => b.versionNumber - a.versionNumber);
+  }, [versions]);
   const deployedVersionId = form.deployedVersionId;
   const draft = form.draft;
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return '—';
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      });
-    } catch {
-      return dateStr;
-    }
-  };
 
   // Deploy Current Draft
   const handleDeployDraft = async () => {
