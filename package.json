@@ -1,0 +1,17 @@
+{
+  "name": "saas-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k -p \"[{name}]\" -n \"API,WEB\" -c \"cyan.bold,magenta.bold\" \"pnpm --filter @saas/api dev\" \"pnpm --filter @saas/web dev\"",
+    "build": "pnpm --filter @saas/shared build && pnpm --filter @saas/api build && pnpm --filter @saas/web build",
+    "lint": "pnpm -r --parallel lint",
+    "test": "pnpm --filter @saas/api test",
+    "seed": "pnpm --filter @saas/api seed",
+    "db:seed": "pnpm --filter @saas/api db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  }
+}
