@@ -22,7 +22,7 @@ export const FormDataPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const loadData = async () => {
+  const loadData = React.useCallback(async () => {
     if (!id) return;
     try {
       setLoading(true);
@@ -34,11 +34,11 @@ export const FormDataPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     loadData();
-  }, [id]);
+  }, [loadData]);
 
   if (loading) {
     return (
