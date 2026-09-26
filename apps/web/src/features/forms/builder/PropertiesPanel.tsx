@@ -109,10 +109,10 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     }
   }, [previewDevice]);
 
-  const handleDeviceTabClick = (dev: 'desktop' | 'tablet' | 'mobile') => {
+  const handleDeviceTabClick = React.useCallback((dev: 'desktop' | 'tablet' | 'mobile') => {
     setActiveDeviceTab(dev);
     onPreviewDeviceChange?.(dev);
-  };
+  }, [onPreviewDeviceChange]);
 
   if (!selection) {
     return null;
