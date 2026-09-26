@@ -107,7 +107,7 @@ export class UsersService {
       filter.tenantId = tenantId;
     }
     if (search && search.trim()) {
-      const term = search.trim();
+      const term = search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       filter.$or = [
         { name: { $regex: term, $options: 'i' } },
         { email: { $regex: term, $options: 'i' } },
