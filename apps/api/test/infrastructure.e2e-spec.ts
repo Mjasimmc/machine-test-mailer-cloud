@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-const request = require('supertest');
+import request from 'supertest';
 import { AppModule } from '../src/app.module';
 
 describe('Scalable Production Infrastructure (e2e)', () => {
@@ -80,4 +80,35 @@ describe('Scalable Production Infrastructure (e2e)', () => {
       }
     });
   });
+
+  describe('4. Webhook Security & SSRF Protection', () => {
+    it('should reject webhook delivery to localhost or internal RFC1918 IPs', async () => {
+      const { WebhookService } = await import('../src/infrastructure/webhook/webhook.service');
+      const webhookService = app.get(WebhookService);
+
+      const result = await webhookService.deliverWebhook({
+        url: 'http://127.0.0.1:8080/internal-hook',
+        formId: 'form_123',
+        data: { field: 'value' },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('SSRF validation failed');
+    });
+
+    it('should successfully dispatch webhook jobs via the queue service', async () => {
+      const { WebhookService } = await import('../src/infrastructure/webhook/webhook.service');
+      const webhookService = app.get(WebhookService);
+
+      const jobId = await webhookService.dispatchWebhook({
+        url: 'https://example.com/webhook',
+        formId: 'form_test_456',
+        data: { email: 'user@example.com' },
+      });
+
+      expect(jobId).toBeDefined();
+      expect(jobId.startsWith('job_')).toBe(true);
+    });
+  });
 });
+

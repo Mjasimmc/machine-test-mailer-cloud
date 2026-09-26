@@ -10,6 +10,7 @@ import { HealthController } from './observability/health.controller';
 import { CorrelationMiddleware } from './observability/correlation.middleware';
 import { AuditLog, AuditLogSchema } from './audit/audit-log.schema';
 import { AuditService } from './audit/audit.service';
+import { WebhookService } from './webhook/webhook.service';
 
 @Global()
 @Module({
@@ -27,6 +28,7 @@ import { AuditService } from './audit/audit.service';
     QueueService,
     StructuredLoggerService,
     AuditService,
+    WebhookService,
   ],
   exports: [
     SecretsService,
@@ -35,6 +37,7 @@ import { AuditService } from './audit/audit.service';
     QueueService,
     StructuredLoggerService,
     AuditService,
+    WebhookService,
     MongooseModule,
   ],
 })
