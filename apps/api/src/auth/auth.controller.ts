@@ -8,6 +8,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -21,9 +22,11 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 import { Throttle } from '@nestjs/throttler';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
 
   private setRefreshCookie(res: Response, rawToken: string) {
     const isProd = process.env.NODE_ENV === 'production';

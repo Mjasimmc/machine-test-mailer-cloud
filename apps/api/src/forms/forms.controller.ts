@@ -7,6 +7,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { ActiveUserGuard } from '../common/guards/active-user.guard';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
@@ -21,10 +22,13 @@ import { UpdateVersionDto } from './dto/update-version.dto';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
 import { FormDto, FormVersionDto, Permission } from '@saas/shared';
 
+@ApiTags('Forms')
+@ApiBearerAuth('JWT-auth')
 @Controller('forms')
 @UseGuards(JwtAuthGuard, ActiveUserGuard, PermissionsGuard)
 export class FormsController {
   constructor(private readonly formsService: FormsService) {}
+
 
   @Post()
   @RequirePermissions(Permission.FORMS_CREATE)

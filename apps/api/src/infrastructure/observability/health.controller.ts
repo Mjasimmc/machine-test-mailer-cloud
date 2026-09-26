@@ -1,12 +1,15 @@
 import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { RedisService } from '../redis/redis.service';
 import { SecretsService } from '../vault/secrets.service';
 
+@ApiTags('Health')
 @Controller('health')
 export class HealthController {
+
   constructor(
     @InjectConnection() private readonly mongoConnection: Connection,
     private readonly redisService: RedisService,

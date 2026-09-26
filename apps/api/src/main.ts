@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as express from 'express';
 const cookieParser = require('cookie-parser');
@@ -7,6 +8,7 @@ import { AppModule } from './app.module';
 import { SecretsService } from './infrastructure/vault/secrets.service';
 import { RedisIoAdapter } from './realtime/redis-io.adapter';
 import { StructuredLoggerService } from './infrastructure/observability/structured-logger.service';
+
 
 async function bootstrap() {
   const logger = new StructuredLoggerService();
@@ -68,9 +70,44 @@ async function bootstrap() {
     }),
   );
 
+  // OpenAPI / Swagger Documentation
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('SaaS Form Builder & Submissions Engine API')
+    .setDescription(
+      'Enterprise RESTful API specification for the Form Builder, AST Schema Engine, Submissions Pipeline, and Administration.',
+    )
+    .setVersion('1.0.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT Access Token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .addTag('Auth', 'Authentication, session management, and token rotation')
+    .addTag('Forms', 'Form lifecycle, AST draft editing, versions, and deployment')
+    .addTag('Submissions', 'Public form intake, responses matrix query, and CSV/JSON export')
+    .addTag('Admin', 'Tenant dashboard analytics, system health, and user administration')
+    .addTag('Health', 'Kubernetes liveness and readiness probes')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+    customSiteTitle: 'SaaS Form Builder API Documentation',
+  });
+
   const port = parseInt(secretsService.get('PORT', '3000'), 10);
   await app.listen(port);
   logger.log(`[API] NestJS Scalable SaaS Modular Monolith running on port ${port}`);
+  logger.log(`[Docs] Interactive OpenAPI Swagger UI available at http://localhost:${port}/docs`);
 }
 
 bootstrap();
+

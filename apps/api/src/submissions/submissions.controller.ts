@@ -9,6 +9,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { SubmissionsService } from './submissions.service';
 import { SubmitFormDto } from '../forms/dto/submit-form.dto';
@@ -21,9 +22,11 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 import { Throttle } from '@nestjs/throttler';
 
+@ApiTags('Submissions')
 @Controller()
 export class SubmissionsController {
   constructor(private readonly submissionsService: SubmissionsService) {}
+
 
   @Post('public/forms/:publicId/submissions')
   @Throttle({ default: { limit: 30, ttl: 60000 } })
