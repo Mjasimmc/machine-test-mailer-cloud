@@ -19,6 +19,22 @@ interface DataSectionProps {
   onRefreshForm?: () => Promise<void>;
 }
 
+const formatDate = (dateStr?: string) => {
+  if (!dateStr) return '—';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
 export const DataSection: React.FC<DataSectionProps> = ({ form }) => {
   const [dataView, setDataView] = useState<FormDataViewDto | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,7 +54,7 @@ export const DataSection: React.FC<DataSectionProps> = ({ form }) => {
   const [selectedRecord, setSelectedRecord] = useState<FormDataRowDto | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
-  const loadData = async () => {
+  const loadData = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -49,20 +65,11 @@ export const DataSection: React.FC<DataSectionProps> = ({ form }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [form.id]);
 
   useEffect(() => {
     loadData();
-  }, [form.id]);
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return '—';
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
+  }, [loadData]);
         hour: 'numeric',
         minute: '2-digit',
       });
