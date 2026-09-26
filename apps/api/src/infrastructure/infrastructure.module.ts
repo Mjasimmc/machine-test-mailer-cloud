@@ -11,6 +11,8 @@ import { CorrelationMiddleware } from './observability/correlation.middleware';
 import { AuditLog, AuditLogSchema } from './audit/audit-log.schema';
 import { AuditService } from './audit/audit.service';
 import { WebhookService } from './webhook/webhook.service';
+import { IpFirewallService } from './security/ip-firewall.service';
+import { IpFirewallMiddleware } from './security/ip-firewall.middleware';
 
 @Global()
 @Module({
@@ -29,6 +31,7 @@ import { WebhookService } from './webhook/webhook.service';
     StructuredLoggerService,
     AuditService,
     WebhookService,
+    IpFirewallService,
   ],
   exports: [
     SecretsService,
@@ -38,11 +41,13 @@ import { WebhookService } from './webhook/webhook.service';
     StructuredLoggerService,
     AuditService,
     WebhookService,
+    IpFirewallService,
     MongooseModule,
   ],
 })
 export class InfrastructureModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorrelationMiddleware).forRoutes('*');
+    consumer.apply(CorrelationMiddleware, IpFirewallMiddleware).forRoutes('*');
   }
 }
+

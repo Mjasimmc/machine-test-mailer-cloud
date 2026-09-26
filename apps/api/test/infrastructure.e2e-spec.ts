@@ -110,5 +110,38 @@ describe('Scalable Production Infrastructure (e2e)', () => {
       expect(jobId.startsWith('job_')).toBe(true);
     });
   });
+
+  describe('5. IP Firewall & Reputation Protection', () => {
+    it('should block requests immediately with 403 when originating from blacklisted IP', async () => {
+      const { IpFirewallService } = await import('../src/infrastructure/security/ip-firewall.service');
+      const firewallService = app.get(IpFirewallService);
+
+      const maliciousIp = '198.51.100.77';
+      await firewallService.blockIp(maliciousIp, 'Automated honeypot trigger', 300);
+
+      const res = await request(app.getHttpServer())
+        .get('/admin/users')
+        .set('X-Forwarded-For', maliciousIp)
+        .expect(403);
+
+      expect(res.body.statusCode).toBe(403);
+      expect(res.body.error).toBe('Forbidden');
+      expect(res.body.message).toContain('Access denied');
+
+      // Unblock and verify access returns to standard auth guard evaluation
+      await firewallService.unblockIp(maliciousIp);
+    });
+
+    it('should populate rate limit headers on incoming standard API traffic', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/admin/users')
+        .expect(401); // 401 because unauthenticated, but headers must be present
+
+      expect(res.headers['x-ratelimit-limit']).toBeDefined();
+      expect(res.headers['x-ratelimit-remaining']).toBeDefined();
+      expect(res.headers['x-ratelimit-reset']).toBeDefined();
+    });
+  });
 });
+
 
