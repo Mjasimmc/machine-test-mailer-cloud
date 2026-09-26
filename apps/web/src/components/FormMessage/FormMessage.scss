@@ -1,0 +1,13 @@
+.form-message {
+  font-size: var(--font-size-xs);
+  margin-top: var(--space-1);
+  display: block;
+
+  &--error {
+    color: var(--color-danger);
+  }
+
+  &--hint {
+    color: var(--color-text-muted);
+  }
+}

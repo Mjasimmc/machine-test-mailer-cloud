@@ -1,0 +1,14 @@
+.form-label {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-1);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &__required {
+    color: var(--color-danger);
+    margin-left: var(--space-1);
+  }
+}

@@ -1,0 +1,35 @@
+// Warm Professional SaaS Color Tokens
+$color-bg-primary: #faf9f7;          // Warm neutral canvas (welcoming, calm, trustworthy)
+$color-bg-secondary: #ffffff;        // Crisp white surface
+$color-bg-tertiary: #f4f2ee;         // Soft warm neutral surface
+$color-bg-card: #ffffff;             // Clean white card surface
+$color-bg-input: #ffffff;            // Crisp white input field
+
+$color-border: rgba(28, 25, 23, 0.08);          // Subtle warm understated border
+$color-border-hover: rgba(28, 25, 23, 0.16);    // Subtle hover border
+$color-border-focus: #4f46e5;                  // Clean indigo focus border
+
+$color-text-primary: #1c1917;        // Warm stone-900 high contrast readable text
+$color-text-secondary: #57534e;      // Stone-600 secondary text
+$color-text-muted: #78716c;          // Stone-500 caption & placeholder text
+
+$color-primary: #4f46e5;             // Indigo 600 trustworthy SaaS primary
+$color-primary-hover: #4338ca;       // Indigo 700
+$color-primary-subtle: rgba(79, 70, 229, 0.08); // Ultra-soft indigo tint
+
+$color-success: #059669;             // Emerald 600
+$color-success-hover: #047857;
+$color-success-subtle: rgba(5, 150, 105, 0.08);
+
+$color-warning: #d97706;             // Amber 600
+$color-warning-hover: #b45309;
+$color-warning-subtle: rgba(217, 119, 6, 0.08);
+
+$color-danger: #dc2626;              // Red 600
+$color-danger-hover: #b91c1c;
+$color-danger-subtle: rgba(220, 38, 38, 0.08);
+
+$color-info: #0284c7;                // Sky 600
+$color-info-hover: #0369a1;
+$color-info-subtle: rgba(2, 132, 199, 0.08);
+

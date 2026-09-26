@@ -1,0 +1,51 @@
+@use '../abstracts' as *;
+
+// Decrease top-level root font size on mobile viewports so all rem values
+// (fonts, paddings, margins, gaps, borders, control heights) scale down in exact visual harmony
+@media (max-width: 640px) {
+  html {
+    font-size: 13px; // Scaled down from default 16px to 13px (81.25%)
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  html {
+    font-size: 14.5px; // Scaled down to 14.5px (90.6%) for tablet/phablet
+  }
+}
+
+body {
+  font-family: var(--font-family-base);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Focus ring defaults
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+// Global scrollbar styling
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.15);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.28);
+}
+

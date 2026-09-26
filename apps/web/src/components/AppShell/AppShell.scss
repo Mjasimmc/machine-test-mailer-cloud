@@ -1,0 +1,21 @@
+.app-shell {
+  display: flex;
+  height: 100vh;           // Fixed viewport frame — never scrolls at body level
+  width: 100%;
+  overflow: hidden;        // Clip children; only .app-shell__content scrolls
+  background-color: var(--color-bg-primary);
+
+  &__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;          // Prevents horizontal overflow from flex children
+    overflow: hidden;      // Contain the sticky header + scrollable content column
+  }
+
+  &__content {
+    flex: 1;
+    overflow-y: auto;      // Only this region scrolls — header stays pinned above
+    padding: var(--space-6);
+  }
+}

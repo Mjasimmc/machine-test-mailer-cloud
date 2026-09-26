@@ -1,0 +1,60 @@
+// Material Symbols Rounded font configuration
+@font-face {
+  font-family: 'Material Symbols Rounded';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: block;
+  src: url('/src/assets/fonts/material-symbols-rounded.woff2') format('woff2');
+}
+
+// Fallback alias so existing 'Material Icons Rounded' references resolve to local woff2
+@font-face {
+  font-family: 'Material Icons Rounded';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: block;
+  src: url('/src/assets/fonts/material-symbols-rounded.woff2') format('woff2');
+}
+
+.material-icon,
+.material-icons-rounded,
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded', 'Material Icons Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  user-select: none;
+}
+
+// Useful modifier classes for Material Symbols
+.material-icon--filled,
+.material-symbols-rounded--filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-icon--sm {
+  font-size: 16px;
+}
+
+.material-icon--md {
+  font-size: 20px;
+}
+
+.material-icon--lg {
+  font-size: 24px;
+}
+
+.material-icon--xl {
+  font-size: 32px;
+}

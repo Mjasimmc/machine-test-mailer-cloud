@@ -1,0 +1,50 @@
+.form-canvas-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-4);
+  width: 100%;
+  min-height: 200px;
+  position: relative;
+}
+
+.canvas-element-card {
+  position: relative;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+
+  &:hover {
+    border-color: var(--color-border-hover, var(--color-primary));
+  }
+
+  &--selected {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  }
+
+  &--dragging {
+    opacity: 0.4;
+    border-style: dashed;
+  }
+}
+
+.canvas-drop-target {
+  border: 2px dashed var(--color-primary);
+  background-color: rgba(99, 102, 241, 0.05);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  min-height: 60px;
+}
+
+/* Mobile responsive collapse */
+@media (max-width: 640px) {
+  .canvas-element-card {
+    grid-column: span 12 !important;
+  }
+}

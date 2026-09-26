@@ -1,0 +1,111 @@
+@use '../abstracts' as *;
+
+:root {
+  /* Color Palette Custom Properties */
+  --color-bg-primary: #{$color-bg-primary};
+  --color-bg-secondary: #{$color-bg-secondary};
+  --color-bg-tertiary: #{$color-bg-tertiary};
+  --color-bg-card: #{$color-bg-card};
+  --color-bg-input: #{$color-bg-input};
+
+  --color-border: #{$color-border};
+  --color-border-hover: #{$color-border-hover};
+  --color-border-focus: #{$color-border-focus};
+
+  --color-text-primary: #{$color-text-primary};
+  --color-text-secondary: #{$color-text-secondary};
+  --color-text-muted: #{$color-text-muted};
+
+  --color-primary: #{$color-primary};
+  --color-primary-hover: #{$color-primary-hover};
+  --color-primary-subtle: #{$color-primary-subtle};
+
+  --color-success: #{$color-success};
+  --color-success-hover: #{$color-success-hover};
+  --color-success-subtle: #{$color-success-subtle};
+
+  --color-warning: #{$color-warning};
+  --color-warning-hover: #{$color-warning-hover};
+  --color-warning-subtle: #{$color-warning-subtle};
+
+  --color-danger: #{$color-danger};
+  --color-danger-hover: #{$color-danger-hover};
+  --color-danger-subtle: #{$color-danger-subtle};
+
+  --color-info: #{$color-info};
+  --color-info-hover: #{$color-info-hover};
+  --color-info-subtle: #{$color-info-subtle};
+
+  /* Typography */
+  --font-family-base: #{$font-family-base};
+  --font-family-mono: #{$font-family-mono};
+
+  --font-size-xs: #{$font-size-xs};
+  --font-size-sm: #{$font-size-sm};
+  --font-size-base: #{$font-size-base};
+  --font-size-lg: #{$font-size-lg};
+  --font-size-xl: #{$font-size-xl};
+  --font-size-2xl: #{$font-size-2xl};
+  --font-size-3xl: #{$font-size-3xl};
+  --font-size-4xl: #{$font-size-4xl};
+
+  --font-weight-regular: #{$font-weight-regular};
+  --font-weight-medium: #{$font-weight-medium};
+  --font-weight-semibold: #{$font-weight-semibold};
+  --font-weight-bold: #{$font-weight-bold};
+
+  --line-height-tight: #{$line-height-tight};
+  --line-height-normal: #{$line-height-normal};
+  --line-height-relaxed: #{$line-height-relaxed};
+
+  /* Spacing */
+  --space-1: #{$space-1};
+  --space-2: #{$space-2};
+  --space-3: #{$space-3};
+  --space-4: #{$space-4};
+  --space-5: #{$space-5};
+  --space-6: #{$space-6};
+  --space-8: #{$space-8};
+  --space-10: #{$space-10};
+  --space-12: #{$space-12};
+  --space-16: #{$space-16};
+
+  /* Radius */
+  --radius-sm: #{$radius-sm};
+  --radius-md: #{$radius-md};
+  --radius-lg: #{$radius-lg};
+  --radius-xl: #{$radius-xl};
+  --radius-full: #{$radius-full};
+
+  /* Shadows */
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+  --shadow-modal: #{$shadow-modal};
+  --shadow-focus: #{$shadow-focus};
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout dimensions */
+  --sidebar-width: 15.625rem;
+  --header-height: 3.5rem;
+
+  /* Form Control Dimensions in rem */
+  --input-height: 2.5rem;
+  --input-height-sm: 2rem;
+  --input-height-lg: 3rem;
+  --btn-height: 2.5rem;
+  --btn-height-sm: 2rem;
+  --btn-height-lg: 3rem;
+  --textarea-min-height: 5rem;
+
+  /* Soft Glass Surface Tokens */
+  --glass-bg-base: rgba(255, 255, 255, 0.85);
+  --glass-bg-elevated: rgba(255, 255, 255, 0.94);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --glass-border-subtle: rgba(15, 23, 42, 0.05);
+  --glass-blur: blur(16px);
+  --glass-blur-lg: blur(20px);
+}
