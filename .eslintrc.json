@@ -12,12 +12,62 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "@typescript-eslint/interface-name-prefix": "off",
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
-    "no-console": ["warn", { "allow": ["warn", "error", "log"] }]
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "curly": ["error", "all"],
+    "no-var": "error",
+    "prefer-const": ["error", { "destructuring": "all" }],
+    "no-duplicate-imports": "error",
+    "no-self-compare": "error",
+    "no-template-curly-in-string": "warn",
+    "no-unmodified-loop-condition": "error",
+    "no-unreachable-loop": "error",
+    "no-useless-concat": "error",
+    "no-useless-return": "error",
+    "prefer-template": "warn",
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
+    "no-script-url": "error",
+    "no-caller": "error",
+    "no-extend-native": "error",
+    "no-iterator": "error",
+    "no-proto": "error",
+    "no-return-assign": ["error", "always"],
+    "no-sequences": "error",
+    "no-throw-literal": "error",
+    "no-shadow-restricted-names": "error",
+    "no-loss-of-precision": "error",
+    "no-promise-executor-return": "error",
+    "no-async-promise-executor": "error",
+    "no-constant-binary-expression": "error",
+    "no-debugger": "error",
+    "no-alert": "warn",
+    "no-console": ["warn", { "allow": ["warn", "error", "info", "log"] }],
+
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/no-duplicate-enum-values": "error",
+    "@typescript-eslint/no-extra-non-null-assertion": "error",
+    "@typescript-eslint/no-misused-new": "error",
+    "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
+    "@typescript-eslint/no-this-alias": "error",
+    "@typescript-eslint/prefer-as-const": "error",
+    "@typescript-eslint/ban-ts-comment": [
+      "error",
+      {
+        "ts-expect-error": "allow-with-description",
+        "ts-ignore": "allow-with-description",
+        "ts-nocheck": true,
+        "ts-check": false,
+        "minimumDescriptionLength": 5
+      }
+    ]
   },
   "env": {
     "node": true,
@@ -30,6 +80,7 @@
     "dist/",
     "build/",
     "coverage/",
+    "uploads/",
     "*.js",
     "*.mjs"
   ]
