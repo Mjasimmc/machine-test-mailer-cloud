@@ -78,7 +78,7 @@ export const FormEditorPage: React.FC = () => {
   }, []);
 
   // Ensure internal platform reference keys are always unique across elements in background
-  const deduplicateReferences = (secs: FormSection[]): FormSection[] => {
+  const deduplicateReferences = useCallback((secs: FormSection[]): FormSection[] => {
     const seen = new Set<string>();
     let modified = false;
     const result = secs.map((sec) => ({
@@ -104,7 +104,7 @@ export const FormEditorPage: React.FC = () => {
       })),
     }));
     return modified ? result : secs;
-  };
+  }, []);
 
   // Sync state and push to history
   const updateSectionsAndHistory = useCallback(
