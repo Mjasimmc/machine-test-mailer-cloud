@@ -67,7 +67,7 @@ export const UserDashboardPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -97,11 +97,11 @@ export const UserDashboardPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadDashboardData();
-  }, []);
+  }, [loadDashboardData]);
 
   // Compute balanced statistics
   const stats = useMemo(() => {
