@@ -28,7 +28,7 @@ export const AdminUsersPage: React.FC = () => {
   // User details modal state
   const [selectedUser, setSelectedUser] = useState<UserDto | null>(null);
 
-  const fetchUsers = async (query = '') => {
+  const fetchUsers = React.useCallback(async (query = '') => {
     try {
       setLoading(true);
       setError(null);
@@ -39,7 +39,7 @@ export const AdminUsersPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
