@@ -8,6 +8,22 @@ interface DeploymentsSectionProps {
   onRefresh: () => Promise<void>;
 }
 
+const formatDate = (dateStr?: string) => {
+  if (!dateStr) return '—';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
 export const DeploymentsSection: React.FC<DeploymentsSectionProps> = ({
   form,
   onRefresh,
@@ -16,24 +32,8 @@ export const DeploymentsSection: React.FC<DeploymentsSectionProps> = ({
   const [isRollbacking, setIsRollbacking] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const deployments = form.deployments || [];
+  const deployments = React.useMemo(() => form.deployments || [], [form.deployments]);
   const deployedVersionId = form.deployedVersionId;
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return '—';
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      });
-    } catch {
-      return dateStr;
-    }
-  };
 
   const handleConfirmRollback = async () => {
     if (!rollbackDeployment) return;
