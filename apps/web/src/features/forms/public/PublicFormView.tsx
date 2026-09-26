@@ -46,14 +46,17 @@ export const PublicFormView: React.FC<PublicFormViewProps> = ({
   }, [customCss, scopeClass]);
 
   // Check if schema already contains an interactive submit button
-  const allElements =
-    sections.length > 0
+  const allElements = React.useMemo(() => {
+    return sections.length > 0
       ? sections.flatMap((s) => s.zones.flatMap((z) => z.elements))
       : elements;
+  }, [sections, elements]);
 
-  const hasExplicitSubmitButton = allElements.some(
-    (el) => el.type === 'button' && (el.buttonAction === 'submit' || !el.buttonAction),
-  );
+  const hasExplicitSubmitButton = React.useMemo(() => {
+    return allElements.some(
+      (el) => el.type === 'button' && (el.buttonAction === 'submit' || !el.buttonAction),
+    );
+  }, [allElements]);
 
   return (
     <div className={`public-form-root ${scopeClass} public-form-root--device-${previewDevice}`}>
