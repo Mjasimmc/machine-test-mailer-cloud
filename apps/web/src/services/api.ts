@@ -103,7 +103,7 @@ function scheduleProactiveRefresh(expSeconds: number): void {
     proactiveRefreshTimer = null;
     // Only refresh if we still hold the same token and no refresh is in-flight
     if (inMemoryAccessToken && !refreshPromise) {
-      refreshPromise = performTokenRefresh();
+      refreshPromise = performTokenRefresh().catch(() => null);
     }
   }, delaySeconds * 1000);
 }
