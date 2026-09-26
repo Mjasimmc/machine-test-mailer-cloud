@@ -15,6 +15,12 @@ jobs:
     name: Lint, Test & Build
     runs-on: ubuntu-latest
 
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -53,8 +59,14 @@ jobs:
       - name: Build All Monorepo Workspaces
         run: pnpm build
 
+      - name: Seed Database
+        env:
+          MONGODB_URI: mongodb://127.0.0.1:27017/saas_db
+        run: pnpm db:seed
+
       - name: Run Backend Unit & E2E Test Suite
         env:
+          MONGODB_URI: mongodb://127.0.0.1:27017/saas_db
           JWT_SECRET: ci-test-secret-key-for-auth-unit-tests
           JWT_EXPIRES_IN: 15m
           JWT_REFRESH_SECRET: ci-test-refresh-secret-key-32-chars

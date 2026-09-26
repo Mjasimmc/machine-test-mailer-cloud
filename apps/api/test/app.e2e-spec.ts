@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const request = require('supertest');
 import { AppModule } from '../src/app.module';
 import { Role, UserStatus } from '@saas/shared';
+import { UsersService } from '../src/users/users.service';
+import * as bcrypt from 'bcryptjs';
 
 jest.setTimeout(60000);
 
@@ -30,6 +32,20 @@ describe('SaaS Full-Stack API (e2e)', () => {
       }),
     );
     await app.init();
+
+    // Ensure admin user exists for test suite
+    const usersService = app.get(UsersService);
+    const existingAdmin = await usersService.findByEmail('admin@saas.local');
+    if (!existingAdmin) {
+      const passwordHash = await bcrypt.hash('AdminPassword123!', 10);
+      await usersService.create({
+        name: 'SaaS Administrator',
+        email: 'admin@saas.local',
+        passwordHash,
+        role: Role.ADMIN,
+        status: UserStatus.ACTIVE,
+      });
+    }
   });
 
   afterAll(async () => {

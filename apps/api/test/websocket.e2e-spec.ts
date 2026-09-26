@@ -5,6 +5,8 @@ const request = require('supertest');
 import { io, Socket } from 'socket.io-client';
 import { AppModule } from '../src/app.module';
 import { Role, SOCKET_EVENTS, UserStatus } from '@saas/shared';
+import { UsersService } from '../src/users/users.service';
+import * as bcrypt from 'bcryptjs';
 
 describe('Real-Time Suspension via Socket.IO (e2e)', () => {
   let app: INestApplication;
@@ -24,6 +26,20 @@ describe('Real-Time Suspension via Socket.IO (e2e)', () => {
     await app.listen(0); // dynamic port
     const address = app.getHttpServer().address();
     serverPort = typeof address === 'string' ? 3000 : address.port;
+
+    // Ensure admin user exists for test suite
+    const usersService = app.get(UsersService);
+    const existingAdmin = await usersService.findByEmail('admin@saas.local');
+    if (!existingAdmin) {
+      const passwordHash = await bcrypt.hash('AdminPassword123!', 10);
+      await usersService.create({
+        name: 'SaaS Administrator',
+        email: 'admin@saas.local',
+        passwordHash,
+        role: Role.ADMIN,
+        status: UserStatus.ACTIVE,
+      });
+    }
 
     // Admin login
     const adminRes = await request(app.getHttpServer())
