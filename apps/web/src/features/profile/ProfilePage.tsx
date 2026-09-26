@@ -84,35 +84,43 @@ export const ProfilePage: React.FC = () => {
 
   if (!user) return null;
 
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(null);
+  const handleUpdate = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setErrorMessage(null);
 
-    if (!editName.trim()) {
-      setErrorMessage('Full name is required');
-      return;
-    }
-    if (!editEmail.trim()) {
-      setErrorMessage('Email address is required');
-      return;
-    }
+      if (!editName.trim()) {
+        setErrorMessage('Full name is required');
+        return;
+      }
+      if (!editEmail.trim()) {
+        setErrorMessage('Email address is required');
+        return;
+      }
 
-    setIsSubmitting(true);
-    try {
-      await updateProfile({ name: editName.trim(), email: editEmail.trim() });
-      setIsEditing(false);
-      setSuccessMessage('Profile updated successfully');
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to update profile');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      setIsSubmitting(true);
+      try {
+        await updateProfile({ name: editName.trim(), email: editEmail.trim() });
+        setIsEditing(false);
+        setSuccessMessage('Profile updated successfully');
+      } catch (err: any) {
+        setErrorMessage(err.message || 'Failed to update profile');
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [editName, editEmail, updateProfile],
+  );
 
-  const formattedDate = user.createdAt
-    ? new Date(user.createdAt).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'long',
+  const formattedDate = React.useMemo(() => {
+    return user.createdAt
+      ? new Date(user.createdAt).toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      : '—';
+  }, [user.createdAt]);
         day: 'numeric',
       })
     : 'N/A';
