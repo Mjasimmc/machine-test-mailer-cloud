@@ -181,19 +181,29 @@ export class FormsService {
     }
 
     const formIds = forms.map((f) => f._id);
-    const submissionCounts = await this.formSubmissionModel.aggregate([
-      { $match: { formId: { $in: formIds } } },
-      { $group: { _id: '$formId', count: { $sum: 1 } } },
+    const [submissionCounts, versionCounts] = await Promise.all([
+      this.formSubmissionModel.aggregate([
+        { $match: { formId: { $in: formIds } } },
+        { $group: { _id: '$formId', count: { $sum: 1 } } },
+      ]),
+      this.formVersionModel.aggregate([
+        { $match: { formId: { $in: formIds } } },
+        { $group: { _id: '$formId', count: { $sum: 1 } } },
+      ]),
     ]);
+
     const submissionCountMap = new Map<string, number>(
       submissionCounts.map((s: any) => [s._id.toString(), s.count]),
+    );
+    const versionCountMap = new Map<string, number>(
+      versionCounts.map((v: any) => [v._id.toString(), v.count]),
     );
 
     const results: FormDto[] = [];
 
     for (const form of forms) {
       const formJson = form.toJSON();
-      const versionsCount = await this.formVersionModel.countDocuments({ formId: form._id });
+      const versionsCount = versionCountMap.get(form._id.toString()) || 0;
       const submissionsCount = submissionCountMap.get(form._id.toString()) || 0;
 
       let deployedVersion: FormVersionDto | null = null;
