@@ -1,4 +1,5 @@
 /// <reference types="jest" />
+import { jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 const cookieParser = require('cookie-parser');
