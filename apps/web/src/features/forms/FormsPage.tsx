@@ -33,7 +33,7 @@ export const FormsPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const loadForms = async () => {
+  const loadForms = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -44,11 +44,11 @@ export const FormsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadForms();
-  }, []);
+  }, [loadForms]);
 
   const handleCreateForm = async (e: React.FormEvent) => {
     e.preventDefault();
