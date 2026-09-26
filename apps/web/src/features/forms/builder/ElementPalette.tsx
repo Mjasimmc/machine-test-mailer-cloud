@@ -146,14 +146,16 @@ export interface ElementPaletteProps {
 export const ElementPalette: React.FC<ElementPaletteProps> = ({ onAddElement }) => {
   const [filter, setFilter] = useState<'all' | 'interactive' | 'display'>('all');
 
-  const handleDragStart = (e: React.DragEvent, type: FormElementType) => {
+  const handleDragStart = React.useCallback((e: React.DragEvent, type: FormElementType) => {
     e.dataTransfer.setData('application/json', JSON.stringify({ action: 'create', type }));
     e.dataTransfer.effectAllowed = 'copy';
-  };
+  }, []);
 
-  const filteredItems = PALETTE_ITEMS.filter(
-    (item) => filter === 'all' || item.category === filter,
-  );
+  const filteredItems = React.useMemo(() => {
+    return PALETTE_ITEMS.filter(
+      (item) => filter === 'all' || item.category === filter,
+    );
+  }, [filter]);
 
   return (
     <Card style={{ display: 'flex', flexDirection: 'column', height: '100%', maxHeight: 'calc(100vh - 140px)' }}>
