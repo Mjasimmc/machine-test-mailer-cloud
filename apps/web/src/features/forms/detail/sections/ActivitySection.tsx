@@ -6,62 +6,62 @@ interface ActivitySectionProps {
   form: FormDto;
 }
 
+const formatDate = (dateStr?: string) => {
+  if (!dateStr) return '—';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
+const getActivityIcon = (type: string) => {
+  switch (type) {
+    case 'form_created':
+      return <span className="material-icon" style={{ fontSize: '18px' }}>add_circle</span>;
+    case 'version_created':
+      return <span className="material-icon" style={{ fontSize: '18px' }}>history</span>;
+    case 'version_deployed':
+      return <span className="material-icon" style={{ fontSize: '18px' }}>rocket_launch</span>;
+    case 'submission_received':
+      return <span className="material-icon" style={{ fontSize: '18px' }}>inbox</span>;
+    case 'settings_updated':
+      return <span className="material-icon" style={{ fontSize: '18px' }}>settings</span>;
+    case 'field_updated':
+      return <span className="material-icon" style={{ fontSize: '18px' }}>edit</span>;
+    default:
+      return <span className="material-icon" style={{ fontSize: '18px' }}>push_pin</span>;
+  }
+};
+
+const getActivityBadge = (type: string) => {
+  switch (type) {
+    case 'version_deployed':
+      return <Badge variant="success" size="small">DEPLOYMENT</Badge>;
+    case 'version_created':
+      return <Badge variant="info" size="small">VERSION</Badge>;
+    case 'submission_received':
+      return <Badge variant="info" size="small">SUBMISSION</Badge>;
+    case 'settings_updated':
+      return <Badge variant="warning" size="small">SETTINGS</Badge>;
+    case 'form_created':
+      return <Badge variant="neutral" size="small">CREATION</Badge>;
+    default:
+      return <Badge variant="neutral" size="small">EVENT</Badge>;
+  }
+};
+
 export const ActivitySection: React.FC<ActivitySectionProps> = ({ form }) => {
   const [filterType, setFilterType] = useState<string>('all');
 
   const activities: FormActivityDto[] = form.activities || [];
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return '—';
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      });
-    } catch {
-      return dateStr;
-    }
-  };
-
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'form_created':
-        return <span className="material-icon" style={{ fontSize: '18px' }}>add_circle</span>;
-      case 'version_created':
-        return <span className="material-icon" style={{ fontSize: '18px' }}>history</span>;
-      case 'version_deployed':
-        return <span className="material-icon" style={{ fontSize: '18px' }}>rocket_launch</span>;
-      case 'submission_received':
-        return <span className="material-icon" style={{ fontSize: '18px' }}>inbox</span>;
-      case 'settings_updated':
-        return <span className="material-icon" style={{ fontSize: '18px' }}>settings</span>;
-      case 'field_updated':
-        return <span className="material-icon" style={{ fontSize: '18px' }}>edit</span>;
-      default:
-        return <span className="material-icon" style={{ fontSize: '18px' }}>push_pin</span>;
-    }
-  };
-
-  const getActivityBadge = (type: string) => {
-    switch (type) {
-      case 'version_deployed':
-        return <Badge variant="success" size="small">DEPLOYMENT</Badge>;
-      case 'version_created':
-        return <Badge variant="info" size="small">VERSION</Badge>;
-      case 'submission_received':
-        return <Badge variant="info" size="small">SUBMISSION</Badge>;
-      case 'settings_updated':
-        return <Badge variant="warning" size="small">SETTINGS</Badge>;
-      case 'form_created':
-        return <Badge variant="neutral" size="small">CREATION</Badge>;
-      default:
-        return <Badge variant="neutral" size="small">EVENT</Badge>;
-    }
-  };
 
   const filteredActivities = useMemo(() => {
     if (filterType === 'all') return activities;
