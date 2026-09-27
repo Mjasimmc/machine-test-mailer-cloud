@@ -8,6 +8,7 @@ export class UpdateSettingsDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(2000, { message: 'Webhook URL cannot exceed 2000 characters' })
   webhookUrl?: string;
 
   @IsOptional()

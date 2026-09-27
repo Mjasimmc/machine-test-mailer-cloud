@@ -19,14 +19,18 @@ export class PublicRuntimeController {
 
     res.setHeader('ETag', etag);
     res.setHeader('Last-Modified', lastModified.toUTCString());
-    res.setHeader('Cache-Control', 'public, no-cache');
+    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    res.setHeader('Vary', 'Accept-Encoding, If-None-Match, If-Modified-Since');
 
     if (ifNoneMatch && ifNoneMatch === etag) {
       return res.status(HttpStatus.NOT_MODIFIED).send();
     }
 
-    if (ifModifiedSince && new Date(ifModifiedSince).getTime() >= lastModified.getTime()) {
-      return res.status(HttpStatus.NOT_MODIFIED).send();
+    if (ifModifiedSince) {
+      const parsedSince = new Date(ifModifiedSince).getTime();
+      if (!isNaN(parsedSince) && parsedSince >= lastModified.getTime()) {
+        return res.status(HttpStatus.NOT_MODIFIED).send();
+      }
     }
 
     return res.status(HttpStatus.OK).json(dto);

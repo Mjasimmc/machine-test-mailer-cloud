@@ -62,6 +62,7 @@ export class Form {
 export const FormSchema = SchemaFactory.createForClass(Form);
 FormSchema.index({ tenantId: 1, userId: 1, updatedAt: -1 });
 FormSchema.index({ tenantId: 1, publicId: 1 });
+FormSchema.index({ publicId: 1, deployedVersionId: 1 });
 FormSchema.set('toJSON', {
   transform: (_, ret: any) => {
     ret.id = ret._id.toString();

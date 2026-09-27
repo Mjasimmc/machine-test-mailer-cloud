@@ -21,5 +21,6 @@ export class CreateVersionDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(20000, { message: 'Custom CSS cannot exceed 20,000 characters' })
   customCss?: string;
 }

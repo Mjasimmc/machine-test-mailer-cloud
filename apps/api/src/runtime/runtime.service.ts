@@ -20,7 +20,11 @@ export class RuntimeService {
   ) {}
 
   async getPublicForm(publicId: string): Promise<RuntimeFormResult> {
-    const form = await this.formModel.findOne({ publicId }).lean().exec();
+    const form = await this.formModel
+      .findOne({ publicId })
+      .select({ name: 1, publicId: 1, deployedVersionId: 1, updatedAt: 1 })
+      .lean()
+      .exec();
     if (!form) {
       throw new NotFoundException(`Public form with ID "${publicId}" not found`);
     }
@@ -46,8 +50,22 @@ export class RuntimeService {
       };
     }
 
-    // Isolate public runtime strictly to the immutable deployed version snapshot
-    const deployedVersion = await this.formVersionModel.findById(form.deployedVersionId).lean().exec();
+    // Isolate public runtime strictly to the immutable deployed version snapshot with lean projection
+    const deployedVersion = await this.formVersionModel
+      .findById(form.deployedVersionId)
+      .select({
+        _id: 1,
+        versionNumber: 1,
+        title: 1,
+        elements: 1,
+        sections: 1,
+        formLayout: 1,
+        customCss: 1,
+        updatedAt: 1,
+      })
+      .lean()
+      .exec();
+
     if (!deployedVersion) {
       const dto: PublicFormDto = {
         publicId: form.publicId,
@@ -67,7 +85,7 @@ export class RuntimeService {
       };
     }
 
-    const versionDate = deployedVersion.updatedAt || new Date();
+    const versionDate = deployedVersion.updatedAt ? new Date(deployedVersion.updatedAt) : new Date();
     // Strong deterministic ETag based on immutable version content hash
     const contentToHash = `${deployedVersion._id.toString()}-v${deployedVersion.versionNumber}-${versionDate.getTime()}`;
     const strongEtag = `"${createHash('sha256').update(contentToHash).digest('hex')}"`;
