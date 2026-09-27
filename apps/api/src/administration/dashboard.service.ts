@@ -1,11 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { DashboardStats, Role, UserStatus } from '@saas/shared';
 
 @Injectable()
 export class DashboardService {
+  private readonly logger = new Logger(DashboardService.name);
+
   constructor(private readonly usersService: UsersService) {}
 
+  /**
+   * Retrieves aggregated user metrics for the administration dashboard.
+   */
   async getAdminStats(): Promise<DashboardStats> {
     const [totalUsers, activeUsers, suspendedUsers] = await Promise.all([
       this.usersService.count({ role: Role.USER }),
@@ -20,3 +25,4 @@ export class DashboardService {
     };
   }
 }
+

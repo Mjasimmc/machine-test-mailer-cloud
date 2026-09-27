@@ -670,6 +670,11 @@ describe('Comprehensive Security & Infrastructure Unit Tests (Coverage Booster)'
           exec: jest.fn().mockResolvedValue(null),
         }),
         find: jest.fn().mockReturnValue({
+          select: jest.fn().mockReturnValue({
+            sort: jest.fn().mockReturnValue({
+              exec: jest.fn().mockResolvedValue([]),
+            }),
+          }),
           sort: jest.fn().mockReturnValue({
             exec: jest.fn().mockResolvedValue([]),
           }),

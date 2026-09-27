@@ -113,7 +113,7 @@ export class UsersService {
         { email: { $regex: term, $options: 'i' } },
       ];
     }
-    return this.userModel.find(filter).sort({ createdAt: -1 }).exec();
+    return this.userModel.find(filter).select('-passwordHash').sort({ createdAt: -1 }).exec();
   }
 
   async count(filter: any = {}): Promise<number> {

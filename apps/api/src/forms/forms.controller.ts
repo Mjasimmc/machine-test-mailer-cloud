@@ -7,7 +7,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { ActiveUserGuard } from '../common/guards/active-user.guard';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
@@ -32,6 +32,7 @@ export class FormsController {
 
   @Post()
   @RequirePermissions(Permission.FORMS_CREATE)
+  @ApiOperation({ summary: 'Create a new form with default starter schema' })
   create(
     @CurrentUser('id') userId: string,
     @CurrentTenant() tenantId: string,
@@ -42,6 +43,7 @@ export class FormsController {
 
   @Get()
   @RequirePermissions(Permission.FORMS_READ)
+  @ApiOperation({ summary: 'List all forms owned by current user and tenant' })
   findAll(
     @CurrentUser('id') userId: string,
     @CurrentTenant() tenantId: string,
@@ -51,6 +53,7 @@ export class FormsController {
 
   @Get(':id')
   @RequirePermissions(Permission.FORMS_READ)
+  @ApiOperation({ summary: 'Retrieve form details by ID' })
   findOne(
     @CurrentUser('id') userId: string,
     @CurrentTenant() tenantId: string,

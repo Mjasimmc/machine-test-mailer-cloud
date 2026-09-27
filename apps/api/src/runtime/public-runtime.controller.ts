@@ -19,7 +19,7 @@ export class PublicRuntimeController {
 
     res.setHeader('ETag', etag);
     res.setHeader('Last-Modified', lastModified.toUTCString());
-    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    res.setHeader('Cache-Control', 'public, no-cache');
     res.setHeader('Vary', 'Accept-Encoding, If-None-Match, If-Modified-Since');
 
     if (ifNoneMatch && ifNoneMatch === etag) {

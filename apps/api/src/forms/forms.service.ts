@@ -204,11 +204,11 @@ export class FormsService {
       .filter((id): id is string => Boolean(id));
 
     const deployedVersions = deployedVersionIds.length > 0
-      ? await this.formVersionModel.find({ _id: { $in: deployedVersionIds } }).exec()
+      ? await this.formVersionModel.find({ _id: { $in: deployedVersionIds } }).lean().exec()
       : [];
 
-    const deployedVersionMap = new Map<string, FormVersionDocument>(
-      deployedVersions.map((v) => [v._id.toString(), v]),
+    const deployedVersionMap = new Map<string, any>(
+      deployedVersions.map((v: any) => [v._id.toString(), v]),
     );
 
     const results: FormDto[] = [];
@@ -222,20 +222,19 @@ export class FormsService {
       if (form.deployedVersionId) {
         const dep = deployedVersionMap.get(form.deployedVersionId.toString());
         if (dep) {
-          const depJson = dep.toJSON();
           deployedVersion = {
-            id: depJson.id,
+            id: dep._id.toString(),
             formId: formJson.id,
             tenantId: form.tenantId,
-            versionNumber: depJson.versionNumber,
-            title: depJson.title,
-            elements: depJson.elements || [],
-            sections: depJson.sections || [],
-            formLayout: (depJson.formLayout as LayoutDirection) || 'column',
-            customCss: depJson.customCss || '',
+            versionNumber: dep.versionNumber,
+            title: dep.title,
+            elements: dep.elements || [],
+            sections: dep.sections || [],
+            formLayout: (dep.formLayout as LayoutDirection) || 'column',
+            customCss: dep.customCss || '',
             isDeployed: true,
-            createdAt: depJson.createdAt?.toISOString?.() || new Date().toISOString(),
-            updatedAt: depJson.updatedAt?.toISOString?.() || new Date().toISOString(),
+            createdAt: dep.createdAt instanceof Date ? dep.createdAt.toISOString() : (dep.createdAt || new Date().toISOString()),
+            updatedAt: dep.updatedAt instanceof Date ? dep.updatedAt.toISOString() : (dep.updatedAt || new Date().toISOString()),
           };
         }
       }
