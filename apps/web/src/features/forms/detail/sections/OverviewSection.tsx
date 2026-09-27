@@ -10,7 +10,7 @@ interface OverviewSectionProps {
   onRefresh: () => Promise<void>;
 }
 
-export const OverviewSection: React.FC<OverviewSectionProps> = ({
+export const OverviewSection: React.FC<OverviewSectionProps> = React.memo(({
   form,
   onNavigateTab,
 }) => {
@@ -453,4 +453,6 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
       </div>
     </div>
   );
-};
+});
+
+OverviewSection.displayName = 'OverviewSection';

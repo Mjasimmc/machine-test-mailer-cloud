@@ -24,7 +24,7 @@ const formatDate = (dateStr?: string) => {
   }
 };
 
-export const DeploymentsSection: React.FC<DeploymentsSectionProps> = ({
+const DeploymentsSectionComponent: React.FC<DeploymentsSectionProps> = ({
   form,
   onRefresh,
 }) => {
@@ -196,3 +196,6 @@ export const DeploymentsSection: React.FC<DeploymentsSectionProps> = ({
     </div>
   );
 };
+
+export const DeploymentsSection = React.memo(DeploymentsSectionComponent);
+DeploymentsSection.displayName = 'DeploymentsSection';

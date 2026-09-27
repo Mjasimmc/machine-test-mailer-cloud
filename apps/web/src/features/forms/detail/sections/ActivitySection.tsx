@@ -58,7 +58,7 @@ const getActivityBadge = (type: string) => {
   }
 };
 
-export const ActivitySection: React.FC<ActivitySectionProps> = ({ form }) => {
+const ActivitySectionComponent: React.FC<ActivitySectionProps> = ({ form }) => {
   const [filterType, setFilterType] = useState<string>('all');
 
   const activities: FormActivityDto[] = form.activities || [];
@@ -177,3 +177,6 @@ export const ActivitySection: React.FC<ActivitySectionProps> = ({ form }) => {
     </div>
   );
 };
+
+export const ActivitySection = React.memo(ActivitySectionComponent);
+ActivitySection.displayName = 'ActivitySection';

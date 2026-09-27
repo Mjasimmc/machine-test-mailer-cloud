@@ -18,7 +18,7 @@ interface SettingsSectionProps {
   onRefresh: () => Promise<void>;
 }
 
-export const SettingsSection: React.FC<SettingsSectionProps> = ({
+const SettingsSectionComponent: React.FC<SettingsSectionProps> = ({
   form,
   onRefresh,
 }) => {
@@ -349,3 +349,6 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
     </div>
   );
 };
+
+export const SettingsSection = React.memo(SettingsSectionComponent);
+SettingsSection.displayName = 'SettingsSection';

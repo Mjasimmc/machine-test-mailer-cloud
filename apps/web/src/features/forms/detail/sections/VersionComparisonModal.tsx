@@ -24,7 +24,7 @@ interface FieldDiffItem {
   changes: string[];
 }
 
-export const VersionComparisonModal: React.FC<VersionComparisonModalProps> = ({
+const VersionComparisonModalComponent: React.FC<VersionComparisonModalProps> = ({
   isOpen,
   onClose,
   form,
@@ -422,3 +422,6 @@ export const VersionComparisonModal: React.FC<VersionComparisonModalProps> = ({
     </Dialog>
   );
 };
+
+export const VersionComparisonModal = React.memo(VersionComparisonModalComponent);
+VersionComparisonModal.displayName = 'VersionComparisonModal';

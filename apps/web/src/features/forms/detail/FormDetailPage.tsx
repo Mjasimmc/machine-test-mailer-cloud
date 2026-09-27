@@ -19,7 +19,7 @@ import { ActivitySection } from './sections/ActivitySection';
 import { SettingsSection } from './sections/SettingsSection';
 import './FormDetailPage.scss';
 
-export const FormDetailPage: React.FC = () => {
+const FormDetailPageComponent: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -304,3 +304,6 @@ export const FormDetailPage: React.FC = () => {
     </ContentContainer>
   );
 };
+
+export const FormDetailPage = React.memo(FormDetailPageComponent);
+FormDetailPage.displayName = 'FormDetailPage';

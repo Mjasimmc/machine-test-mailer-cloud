@@ -13,7 +13,7 @@ import {
   Alert,
 } from '../../components';
 
-export const FormDataPage: React.FC = () => {
+const FormDataPageComponent: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -445,3 +445,6 @@ export const FormDataPage: React.FC = () => {
     </ContentContainer>
   );
 };
+
+export const FormDataPage = React.memo(FormDataPageComponent);
+FormDataPage.displayName = 'FormDataPage';

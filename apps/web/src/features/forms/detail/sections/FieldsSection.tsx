@@ -28,7 +28,7 @@ interface FlattenedFieldItem {
   isInteractive: boolean;
 }
 
-export const FieldsSection: React.FC<FieldsSectionProps> = ({ form }) => {
+const FieldsSectionComponent: React.FC<FieldsSectionProps> = ({ form }) => {
   const versions = form.versions || [];
   const deployedVersionId = form.deployedVersionId;
 
@@ -323,3 +323,6 @@ export const FieldsSection: React.FC<FieldsSectionProps> = ({ form }) => {
     </div>
   );
 };
+
+export const FieldsSection = React.memo(FieldsSectionComponent);
+FieldsSection.displayName = 'FieldsSection';

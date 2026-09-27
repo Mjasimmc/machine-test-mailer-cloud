@@ -33,7 +33,7 @@ const formatDate = (dateStr?: string) => {
   }
 };
 
-export const VersionsSection: React.FC<VersionsSectionProps> = ({
+const VersionsSectionComponent: React.FC<VersionsSectionProps> = ({
   form,
   onRefresh,
   onNavigateTab,
@@ -458,3 +458,6 @@ export const VersionsSection: React.FC<VersionsSectionProps> = ({
     </div>
   );
 };
+
+export const VersionsSection = React.memo(VersionsSectionComponent);
+VersionsSection.displayName = 'VersionsSection';

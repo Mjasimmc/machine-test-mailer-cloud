@@ -35,7 +35,7 @@ const formatDate = (dateStr?: string) => {
   }
 };
 
-export const DataSection: React.FC<DataSectionProps> = ({ form }) => {
+export const DataSection: React.FC<DataSectionProps> = React.memo(({ form }) => {
   const [dataView, setDataView] = useState<FormDataViewDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -609,4 +609,7 @@ export const DataSection: React.FC<DataSectionProps> = ({ form }) => {
       </Dialog>
     </div>
   );
-};
+});
+
+DataSection.displayName = 'DataSection';
+
