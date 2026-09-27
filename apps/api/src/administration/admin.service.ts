@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
@@ -10,17 +11,25 @@ import { Role, UserDto, UserStatus } from '@saas/shared';
 
 @Injectable()
 export class AdminService {
+  private readonly logger = new Logger(AdminService.name);
+
   constructor(
     private readonly usersService: UsersService,
     private readonly realtimeService: RealtimeService,
     private readonly auditService: AuditService,
   ) {}
 
+  /**
+   * Retrieves a filtered list of users for administration.
+   */
   async listUsers(search?: string): Promise<UserDto[]> {
     const users = await this.usersService.findAll(search);
     return users.map((u) => this.formatUserDto(u));
   }
 
+  /**
+   * Retrieves a single user record by ID.
+   */
   async getUserById(id: string): Promise<UserDto> {
     const user = await this.usersService.findById(id);
     if (!user) {
@@ -29,6 +38,9 @@ export class AdminService {
     return this.formatUserDto(user);
   }
 
+  /**
+   * Suspends a user account and revokes real-time socket connections.
+   */
   async suspendUser(id: string, currentAdminId: string): Promise<UserDto> {
     const user = await this.usersService.findById(id);
     if (!user) {
@@ -61,6 +73,9 @@ export class AdminService {
     return this.formatUserDto(updatedUser);
   }
 
+  /**
+   * Unsuspends a user account and re-enables full access.
+   */
   async unsuspendUser(id: string, currentAdminId?: string): Promise<UserDto> {
     const user = await this.usersService.findById(id);
     if (!user) {
@@ -94,4 +109,5 @@ export class AdminService {
     };
   }
 }
+
 
