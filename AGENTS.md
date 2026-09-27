@@ -2,7 +2,7 @@
 
 > **Scope**: Repository-wide architectural boundaries, coding standards, validation commands, and modification constraints.  
 > **Source of Truth**: [`package.json`](file:///c:/Users/Muhammed%20Jasim/machine-test/package.json), [`pnpm-workspace.yaml`](file:///c:/Users/Muhammed%20Jasim/machine-test/pnpm-workspace.yaml), and source implementations in `apps/` and `packages/`.  
-> **Last Verified**: 2026-09-24
+> **Last Verified**: 2026-09-27
 
 ---
 

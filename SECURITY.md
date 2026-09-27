@@ -1,8 +1,8 @@
 # Security Policy & Controls
 
-> **Scope**: Vulnerability reporting, authentication mechanisms, authorization boundaries, tenant isolation, and threat model.  
-> **Source of Truth**: Implementation across `apps/api/src/auth`, `apps/api/src/common/guards`, `apps/api/src/infrastructure/audit`, and `nginx/`.  
-> **Last Verified**: 2026-09-25
+> **Scope**: Vulnerability reporting, authentication mechanisms, authorization boundaries, tenant isolation, IP firewalling, honeypots, and threat model.  
+> **Source of Truth**: Implementation across `apps/api/src/auth`, `apps/api/src/common/guards`, `apps/api/src/infrastructure/security`, `apps/api/src/infrastructure/audit`, and `nginx/`.  
+> **Last Verified**: 2026-09-27
 
 ---
 
@@ -14,6 +14,7 @@
 - **Refresh Token Rotation**: Persistent 7-day refresh tokens stored as SHA-256 hashes in `refreshtokens`. Grouped into families; reuse of an old token triggers instant family revocation.
 - **Session Revocation**: `tokenVersion` on `User` increments upon password change or `POST /auth/logout-all`, instantly invalidating tokens cluster-wide.
 - **Secret Protection**: Passwords and `passwordHash` are stripped from all JSON serialization outputs via Mongoose schema `toJSON` transforms and redacted in audit logs.
+- **Input Sanitization**: DTOs enforce `@Transform` trim operations on email and name inputs, preventing trailing whitespace attacks and normalization vulnerabilities.
 
 ### 1.2 Authorization & Multi-Tenant Isolation
 - **Role-Based Access Control (RBAC)**: Supported roles are `Role.ADMIN` and `Role.USER`.
@@ -27,7 +28,8 @@
 - The server forcefully terminates open sockets (`server.in(room).disconnectSockets(true)`).
 - The client `SocketProvider` purges tokens from `localStorage` and redirects to `/account-suspended`.
 
-### 1.4 Runtime Protections
+### 1.4 Runtime Protections & IP Firewall
+- **IP Firewall & Automated Honeypot Defense**: `IpFirewallMiddleware` and `IpFirewallService` intercept suspicious endpoint probes (e.g., `/.env`, `/wp-login.php`, `/.git`), automatically banning offending IPs with Redis/in-memory fallback state tracking.
 - **ReDoS Defense**: `safeRegexTest` checks nested quantifiers and input string bounds.
 - **SSRF Protection**: `validateSafeUrl` verifies DNS resolutions, blocking private IP ranges (RFC 1918), loopback, and cloud metadata (`169.254.169.254`).
 - **Container Least Privilege**: Docker containers execute as non-root `USER node`.
@@ -44,6 +46,7 @@
 | **Cross-Tenant Access (IDOR/BOLA)**| Form / Submission CRUD | Server-derived tenant context and ownership validation returning HTTP 403. | Public forms are open by design via `publicId`. |
 | **ReDoS Catastrophic Backtracking**| Public Submissions | `safeRegexTest` detects nested quantifiers and limits input length. | Valid complex regexes constrained by input bounds. |
 | **Server-Side Request Forgery** | Webhook Dispatch | `validateSafeUrl` with DNS resolution blocks private IPs and metadata endpoints. | None. |
+| **Automated Vulnerability Scanning** | Edge Ingress / API | IP Firewall honeypot traps trigger instant IP bans across edge/cluster. | Distributed residential proxies require cloud WAF. |
 | **Public Form Spam / Flooding** | Public Submissions | Rate limiting at edge (Nginx 5r/s burst 20) + NestJS Throttler + payload size bounds (200 keys max). | Large distributed botnets require cloud edge WAF. |
 
 ---

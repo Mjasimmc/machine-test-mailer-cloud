@@ -2,7 +2,7 @@
 
 > **Scope**: Developer contribution workflow, code formatting standards, branch management, and PR validation rules.  
 > **Source of Truth**: `package.json` scripts and workspace configuration.  
-> **Last Verified**: 2026-09-25
+> **Last Verified**: 2026-09-27
 
 ---
 

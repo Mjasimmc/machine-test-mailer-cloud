@@ -2,7 +2,7 @@
 
 > **Scope**: Horizontally scalable modular monolith topology, multi-tenant isolation, fine-grained RBAC, hardened authentication & token rotation, concurrency control, SSRF & ReDoS mitigation, deterministic caching, audit logging, real-time scaling, Vault secret management, container security, and disaster recovery.  
 > **Source of Truth**: Implementation across `apps/api`, `apps/web`, `packages/shared`, `nginx/`, and `docker-compose.yml`.  
-> **Last Verified**: 2026-09-25
+> **Last Verified**: 2026-09-27
 
 ---
 
@@ -274,3 +274,14 @@ Audit logs are indexed by `{ tenantId: 1, createdAt: -1 }` and `{ action: 1, cre
 * **Disaster Recovery Strategy**:
   - Authoritative data resides exclusively in MongoDB; Point-in-Time Recovery (PITR) enabled via replica set oplog archiving.
   - Redis contains transient distributed state; failure causes graceful degradation without business data loss.
+
+---
+
+## 12. Performance Optimization & Monorepo Invariants
+
+* **Frontend React Memoization**: All form canvas elements, floating inspector panels, page-level views, detail sections, and context providers implement `React.memo` and `useMemo`/`useCallback` bindings to guarantee zero unnecessary re-renders during high-frequency typing and dragging operations.
+* **LRU CSS Scope Caching**: Dynamic CSS transforms for custom form elements are memoized with an LRU cache, preventing redundant DOM style node recalculations.
+* **Mongoose Projection & Query Optimization**: High-volume backend queries utilize `.lean()` and targeted field projections (`select('-passwordHash')`) alongside compound B-tree indexing on `{ tenantId: 1, status: 1, role: 1 }` and `{ tenantId: 1, userId: 1, isRevoked: 1 }`.
+* **Asynchronous Queue & Dead Letter Queue (DLQ)**: Non-blocking background worker processes webhook dispatches and external notifications with exponential backoff retries and DLQ isolation.
+* **Deterministic CDN & Browser Caching**: Public form endpoints return strong SHA-256 ETags with `Cache-Control: public, no-cache`, allowing CDN edge layers and browsers to validate freshness using conditional `304 Not Modified` responses.
+

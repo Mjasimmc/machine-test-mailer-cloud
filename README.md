@@ -119,14 +119,18 @@ docker compose up --build -d
 
 ## 5. Documentation Navigation
 
-Detailed technical documentation is available in the [`docs/`](file:///home/sct/dd/multi-tenant-form-builder/docs/) directory:
+Detailed technical documentation is available in the [`docs/`](file:///c:/Users/Muhammed%20Jasim/machine-test/docs/) directory:
 
-- [Documentation Index](file:///home/sct/dd/multi-tenant-form-builder/docs/README.md)
-- [System Architecture (ARCHITECTURE.md)](file:///home/sct/dd/multi-tenant-form-builder/ARCHITECTURE.md)
-- [Canonical API Inventory](file:///home/sct/dd/multi-tenant-form-builder/docs/api/api-inventory.md)
-- [Source of Truth Mapping](file:///home/sct/dd/multi-tenant-form-builder/docs/source-of-truth.md)
-- [Security Architecture & Threat Model](file:///home/sct/dd/multi-tenant-form-builder/docs/security/security-architecture.md)
-- [Architecture Risks & Technical Debt](file:///home/sct/dd/multi-tenant-form-builder/docs/risks/architecture-risks.md)
-- [Security Gap & Control Matrix](file:///home/sct/dd/multi-tenant-form-builder/docs/risks/security-gaps.md)
-- [Architecture Decision Records (ADRs)](file:///home/sct/dd/multi-tenant-form-builder/docs/decisions/README.md)
-- [Database Schema Contracts](file:///home/sct/dd/multi-tenant-form-builder/docs/contracts/database.md)
+- [Documentation Index](file:///c:/Users/Muhammed%20Jasim/machine-test/docs/README.md)
+- [System Architecture (ARCHITECTURE.md)](file:///c:/Users/Muhammed%20Jasim/machine-test/ARCHITECTURE.md)
+- [Security Policy & Controls (SECURITY.md)](file:///c:/Users/Muhammed%20Jasim/machine-test/SECURITY.md)
+- [Operational Directives for AI Agents (AGENTS.md)](file:///c:/Users/Muhammed%20Jasim/machine-test/AGENTS.md)
+- [Contributor Guide (CONTRIBUTING.md)](file:///c:/Users/Muhammed%20Jasim/machine-test/CONTRIBUTING.md)
+- [Canonical API Inventory](file:///c:/Users/Muhammed%20Jasim/machine-test/docs/api/api-inventory.md)
+- [Source of Truth Mapping](file:///c:/Users/Muhammed%20Jasim/machine-test/docs/source-of-truth.md)
+- [Security Architecture & Threat Model](file:///c:/Users/Muhammed%20Jasim/machine-test/docs/security/security-architecture.md)
+- [Architecture Risks & Technical Debt](file:///c:/Users/Muhammed%20Jasim/machine-test/docs/risks/architecture-risks.md)
+- [Security Gap & Control Matrix](file:///c:/Users/Muhammed%20Jasim/machine-test/docs/risks/security-gaps.md)
+- [Architecture Decision Records (ADRs)](file:///c:/Users/Muhammed%20Jasim/machine-test/docs/decisions/README.md)
+- [Database Schema Contracts](file:///c:/Users/Muhammed%20Jasim/machine-test/docs/contracts/database.md)
+
