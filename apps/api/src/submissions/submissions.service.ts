@@ -21,6 +21,7 @@ import {
   FormSection,
   GetFormDataQueryDto,
   evaluateConditionGroup,
+  isDataField,
 } from '@saas/shared';
 import { SubmitFormDto } from '../forms/dto/submit-form.dto';
 import { QueueService } from '../infrastructure/queue/queue.service';
@@ -29,6 +30,11 @@ import { safeRegexTest } from '../common/utils/safe-regex';
 
 @Injectable()
 export class SubmissionsService {
+  private readonly versionCache = new Map<string, {
+    versionNumber: number;
+    elements: FormElement[];
+  }>();
+
   constructor(
     @InjectModel(Form.name) private readonly formModel: Model<FormDocument>,
     @InjectModel(FormVersion.name) private readonly formVersionModel: Model<FormVersionDocument>,
@@ -87,7 +93,7 @@ export class SubmissionsService {
       }
     }
 
-    const form = await this.formModel.findOne({ publicId }).exec();
+    const form = await this.formModel.findOne({ publicId }).lean().exec();
     if (!form) {
       throw new NotFoundException(`Public form with ID "${publicId}" not found`);
     }
@@ -103,6 +109,10 @@ export class SubmissionsService {
       );
     }
 
+    const formId = form._id.toString();
+    const tenantId = form.tenantId || (form.userId ? form.userId.toString() : '');
+    const deployedVersionId = form.deployedVersionId.toString();
+
     if (settings.submissionLimit && settings.submissionLimit > 0) {
       const existingCount = await this.formSubmissionModel.countDocuments({ formId: form._id });
       if (existingCount >= settings.submissionLimit) {
@@ -112,40 +122,49 @@ export class SubmissionsService {
       }
     }
 
-    const deployedVersion = await this.formVersionModel.findById(form.deployedVersionId).exec();
-    if (!deployedVersion) {
-      throw new BadRequestException('The deployed version for this form is unavailable');
+    // Lookup immutable deployed version from memory cache or DB
+    let cachedVersion = this.versionCache.get(deployedVersionId);
+    if (!cachedVersion) {
+      const deployedVersion = await this.formVersionModel.findById(form.deployedVersionId).lean().exec();
+      if (!deployedVersion) {
+        throw new BadRequestException('The deployed version for this form is unavailable');
+      }
+
+      const elements: FormElement[] = [];
+      if (deployedVersion.sections && deployedVersion.sections.length > 0) {
+        for (const section of deployedVersion.sections) {
+          for (const zone of section.zones || []) {
+            for (const el of zone.elements || []) {
+              elements.push(el);
+            }
+          }
+        }
+      } else if (deployedVersion.elements && deployedVersion.elements.length > 0) {
+        elements.push(...deployedVersion.elements);
+      }
+
+      cachedVersion = {
+        versionNumber: deployedVersion.versionNumber,
+        elements,
+      };
+
+      if (this.versionCache.size > 1000) {
+        const firstKey = this.versionCache.keys().next().value;
+        if (firstKey) this.versionCache.delete(firstKey);
+      }
+      this.versionCache.set(deployedVersionId, cachedVersion);
     }
+
+    const { versionNumber, elements } = cachedVersion;
 
     // Payload limits and anti-abuse validation
     this.validateSubmissionPayload(dto.data || {});
 
-    // Server-side validation against the deployed immutable version schema
-    const elements: FormElement[] = [];
-    if (deployedVersion.sections && deployedVersion.sections.length > 0) {
-      for (const section of deployedVersion.sections) {
-        for (const zone of section.zones || []) {
-          for (const el of zone.elements || []) {
-            elements.push(el);
-          }
-        }
-      }
-    } else if (deployedVersion.elements && deployedVersion.elements.length > 0) {
-      elements.push(...deployedVersion.elements);
-    }
-
     const submittedData = dto.data || {};
 
     for (const el of elements) {
-      const isDataField =
-        el.type !== 'button' &&
-        el.type !== 'title' &&
-        el.type !== 'description' &&
-        el.type !== 'divider' &&
-        el.type !== 'spacer' &&
-        el.type !== 'alert';
-
-      if (!isDataField) continue;
+      const isData = isDataField(el.type);
+      if (!isData) continue;
 
       // Skip validation if field is conditionally hidden
       const isVisible = evaluateConditionGroup(el.conditions, submittedData);
@@ -195,21 +214,10 @@ export class SubmissionsService {
       }
     }
 
-    // Derive tenant identity server-side from form
-    const tenantId = form.tenantId || form.userId.toString();
-
     // Canonicalize submitted data to eliminate redundant duplicated keys
-    const canonicalData: Record<string, any> = {};
+    const canonicalData: Record<string, any> = { ...(dto.data || {}) };
     for (const el of elements) {
-      const isDataField =
-        el.type !== 'button' &&
-        el.type !== 'title' &&
-        el.type !== 'description' &&
-        el.type !== 'divider' &&
-        el.type !== 'spacer' &&
-        el.type !== 'alert';
-
-      if (!isDataField) continue;
+      if (!isDataField(el.type)) continue;
 
       const fieldKey = el.reference || el.id;
       const rawVal = submittedData[fieldKey] !== undefined ? submittedData[fieldKey] : submittedData[el.id];
@@ -220,33 +228,33 @@ export class SubmissionsService {
 
     // Persist immutable submission record linked permanently to the versionId and tenantId
     const submission = await this.formSubmissionModel.create({
-      formId: form._id,
+      formId: new Types.ObjectId(formId),
       tenantId,
-      versionId: deployedVersion._id,
+      versionId: new Types.ObjectId(deployedVersionId),
       data: canonicalData,
     });
 
-    // Record submission activity on Form document
+    // Record submission activity on Form document (capped at 100 most recent)
     const activity = {
       id: `act_${randomBytes(4).toString('hex')}`,
-      formId: form._id.toString(),
+      formId,
       type: 'submission_received',
       title: 'New submission received',
-      description: `Submission recorded under Version ${deployedVersion.versionNumber}.`,
+      description: `Submission recorded under Version ${versionNumber}.`,
       timestamp: new Date().toISOString(),
-      versionNumber: deployedVersion.versionNumber,
+      versionNumber,
     };
 
     await this.formModel.updateOne(
-      { _id: form._id },
-      { $push: { activities: { $each: [activity], $position: 0 } } },
+      { _id: new Types.ObjectId(formId) },
+      { $push: { activities: { $each: [activity], $position: 0, $slice: 100 } } },
     );
 
     // Asynchronously dispatch webhook notification if configured
     if (settings.webhookUrl) {
       await this.queueService.dispatch('webhook_notification', {
         url: settings.webhookUrl,
-        formId: form._id.toString(),
+        formId,
         submissionId: submission._id.toString(),
         data: canonicalData,
       });

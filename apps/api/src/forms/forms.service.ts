@@ -489,7 +489,7 @@ export class FormsService {
       timestamp: new Date().toISOString(),
       versionNumber: newVersion.versionNumber,
     };
-    form.activities = [activity, ...(form.activities || [])];
+    form.activities = [activity, ...(form.activities || [])].slice(0, 100);
 
     await form.save();
 
@@ -567,7 +567,7 @@ export class FormsService {
       timestamp: new Date().toISOString(),
       versionNumber: version.versionNumber,
     };
-    form.activities = [activity, ...(form.activities || [])];
+    form.activities = [activity, ...(form.activities || [])].slice(0, 100);
 
     await form.save();
 

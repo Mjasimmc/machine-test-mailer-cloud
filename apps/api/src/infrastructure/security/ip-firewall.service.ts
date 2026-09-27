@@ -24,6 +24,7 @@ export class IpFirewallService implements OnModuleInit {
   // In-memory fallback sets for local/standalone resilience
   private localBlacklist = new Map<string, BlockedIpRecord>();
   private localRateLimitMap = new Map<string, { count: number; expiresAt: number }>();
+  private localSuspiciousMap = new Map<string, { count: number; expiresAt: number }>();
 
   // Redis Keys
   private readonly blacklistSetKey = 'saas:firewall:blacklist:set';
@@ -247,6 +248,7 @@ export class IpFirewallService implements OnModuleInit {
   async recordSuspiciousHit(ip: string, reason: string = 'Automated anomaly threshold exceeded'): Promise<{ autoBanned: boolean }> {
     const normalizedIp = this.normalizeIp(ip);
     const key = `${this.suspiciousCounterPrefix}${normalizedIp}`;
+    const now = Date.now();
 
     let hitCount = 1;
     if (this.redisService.isAvailable()) {
@@ -260,6 +262,15 @@ export class IpFirewallService implements OnModuleInit {
         }
       } catch {
         hitCount = 1;
+      }
+    } else {
+      const entry = this.localSuspiciousMap.get(key);
+      if (!entry || entry.expiresAt <= now) {
+        this.localSuspiciousMap.set(key, { count: 1, expiresAt: now + 60000 });
+        hitCount = 1;
+      } else {
+        entry.count += 1;
+        hitCount = entry.count;
       }
     }
 
