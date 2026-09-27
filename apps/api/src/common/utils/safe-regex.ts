@@ -34,14 +34,19 @@ const compiledRegexCache = new Map<string, RegExp>();
 
 function getCompiledRegex(pattern: string): RegExp {
   let cached = compiledRegexCache.get(pattern);
-  if (!cached) {
-    if (compiledRegexCache.size >= REGEX_CACHE_MAX) {
-      const firstKey = compiledRegexCache.keys().next().value;
-      if (firstKey) compiledRegexCache.delete(firstKey);
-    }
-    cached = new RegExp(pattern);
+  if (cached) {
+    // Refresh LRU position
+    compiledRegexCache.delete(pattern);
     compiledRegexCache.set(pattern, cached);
+    return cached;
   }
+
+  if (compiledRegexCache.size >= REGEX_CACHE_MAX) {
+    const firstKey = compiledRegexCache.keys().next().value;
+    if (firstKey) compiledRegexCache.delete(firstKey);
+  }
+  cached = new RegExp(pattern);
+  compiledRegexCache.set(pattern, cached);
   return cached;
 }
 

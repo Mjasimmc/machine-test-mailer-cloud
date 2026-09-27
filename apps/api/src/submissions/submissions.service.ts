@@ -282,7 +282,11 @@ export class SubmissionsService {
       throw new NotFoundException('Form not found');
     }
 
-    const form = await this.formModel.findById(formId).exec();
+    const form = await this.formModel
+      .findById(formId)
+      .select({ userId: 1, tenantId: 1, name: 1 })
+      .lean()
+      .exec();
     if (!form) {
       throw new NotFoundException('Form not found');
     }

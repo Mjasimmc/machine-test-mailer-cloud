@@ -53,13 +53,15 @@ export class SubmissionsController {
     @Query('versionFilter') versionFilter?: string,
     @Query('search') search?: string,
   ): Promise<FormDataViewDto> {
+    const pageNum = page ? Math.max(1, parseInt(page, 10)) : undefined;
+    const limitNum = limit ? Math.min(100, Math.max(1, parseInt(limit, 10))) : undefined;
     const query: GetFormDataQueryDto = {
-      page: page ? parseInt(page, 10) : undefined,
-      limit: limit ? parseInt(limit, 10) : undefined,
-      sortField,
+      page: !isNaN(pageNum as number) ? pageNum : undefined,
+      limit: !isNaN(limitNum as number) ? limitNum : undefined,
+      sortField: sortField?.trim(),
       sortDirection,
-      versionFilter,
-      search,
+      versionFilter: versionFilter?.trim(),
+      search: search?.trim(),
     };
     return this.submissionsService.getDataView(userId, formId, tenantId, query);
   }

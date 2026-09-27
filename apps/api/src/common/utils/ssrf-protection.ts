@@ -19,12 +19,13 @@ export async function validateSafeUrl(rawUrl: string): Promise<string> {
 
   const hostname = parsed.hostname.toLowerCase();
 
-  // Block obvious localhost / internal hostnames
+  // Block obvious localhost / internal hostnames / cloud metadata IP
   if (
     hostname === 'localhost' ||
     hostname === '127.0.0.1' ||
     hostname === '0.0.0.0' ||
     hostname === '::1' ||
+    hostname === '169.254.169.254' ||
     hostname.endsWith('.local') ||
     hostname.endsWith('.internal')
   ) {

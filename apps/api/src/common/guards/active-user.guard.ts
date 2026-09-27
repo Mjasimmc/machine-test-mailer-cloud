@@ -17,7 +17,7 @@ export class ActiveUserGuard implements CanActivate {
       throw new UnauthorizedException('Authentication required');
     }
 
-    if (user.status === UserStatus.SUSPENDED) {
+    if (user.status === UserStatus.SUSPENDED || user.status === 'SUSPENDED') {
       throw new ForbiddenException({
         statusCode: 403,
         error: 'Forbidden',
