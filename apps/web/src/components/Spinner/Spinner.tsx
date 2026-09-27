@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import './Spinner.scss';
 
 export interface SpinnerProps {
@@ -6,7 +6,7 @@ export interface SpinnerProps {
   className?: string;
 }
 
-export const Spinner: React.FC<SpinnerProps> = ({
+export const Spinner: React.FC<SpinnerProps> = memo(({
   size = 'medium',
   className = '',
 }) => {
@@ -17,4 +17,6 @@ export const Spinner: React.FC<SpinnerProps> = ({
       aria-label="Loading"
     />
   );
-};
+});
+
+Spinner.displayName = 'Spinner';

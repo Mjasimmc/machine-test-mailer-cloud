@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import './Skeleton.scss';
 
 export interface SkeletonProps {
@@ -9,7 +9,7 @@ export interface SkeletonProps {
   style?: React.CSSProperties;
 }
 
-export const Skeleton: React.FC<SkeletonProps> = ({
+export const Skeleton: React.FC<SkeletonProps> = memo(({
   variant = 'rect',
   width,
   height,
@@ -29,4 +29,6 @@ export const Skeleton: React.FC<SkeletonProps> = ({
       aria-hidden="true"
     />
   );
-};
+});
+
+Skeleton.displayName = 'Skeleton';

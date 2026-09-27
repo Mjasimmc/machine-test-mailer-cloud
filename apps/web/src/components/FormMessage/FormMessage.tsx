@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import './FormMessage.scss';
 
 export interface FormMessageProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -6,7 +6,7 @@ export interface FormMessageProps extends React.HTMLAttributes<HTMLSpanElement> 
   children: React.ReactNode;
 }
 
-export const FormMessage: React.FC<FormMessageProps> = ({
+export const FormMessage: React.FC<FormMessageProps> = memo(({
   variant = 'error',
   children,
   className = '',
@@ -19,4 +19,6 @@ export const FormMessage: React.FC<FormMessageProps> = ({
       {children}
     </span>
   );
-};
+});
+
+FormMessage.displayName = 'FormMessage';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import './Badge.scss';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -9,7 +9,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode;
 }
 
-export const Badge: React.FC<BadgeProps> = ({
+export const Badge: React.FC<BadgeProps> = memo(({
   variant = 'neutral',
   size = 'medium',
   pill = true,
@@ -34,4 +34,6 @@ export const Badge: React.FC<BadgeProps> = ({
       {children}
     </span>
   );
-};
+});
+
+Badge.displayName = 'Badge';

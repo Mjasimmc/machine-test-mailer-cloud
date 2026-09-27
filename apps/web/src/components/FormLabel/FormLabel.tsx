@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import './FormLabel.scss';
 
 export interface FormLabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
@@ -6,7 +6,7 @@ export interface FormLabelProps extends React.LabelHTMLAttributes<HTMLLabelEleme
   children: React.ReactNode;
 }
 
-export const FormLabel: React.FC<FormLabelProps> = ({
+export const FormLabel: React.FC<FormLabelProps> = memo(({
   required = false,
   children,
   className = '',
@@ -18,4 +18,6 @@ export const FormLabel: React.FC<FormLabelProps> = ({
       {required && <span className="form-label__required" aria-hidden="true">*</span>}
     </label>
   );
-};
+});
+
+FormLabel.displayName = 'FormLabel';

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import './Toast.scss';
 
 export interface ToastProps {
@@ -10,7 +10,7 @@ export interface ToastProps {
   className?: string;
 }
 
-export const Toast: React.FC<ToastProps> = ({
+export const Toast: React.FC<ToastProps> = memo(({
   message,
   variant = 'info',
   duration = 4000,
@@ -40,4 +40,6 @@ export const Toast: React.FC<ToastProps> = ({
       )}
     </div>
   );
-};
+});
+
+Toast.displayName = 'Toast';

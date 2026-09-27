@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { memo } from 'react';
 import './FormField.scss';
 
 export interface FormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-export const FormField: React.FC<FormFieldProps> = ({
+export const FormField: React.FC<FormFieldProps> = memo(({
   children,
   className = '',
   ...props
@@ -15,4 +15,6 @@ export const FormField: React.FC<FormFieldProps> = ({
       {children}
     </div>
   );
-};
+});
+
+FormField.displayName = 'FormField';

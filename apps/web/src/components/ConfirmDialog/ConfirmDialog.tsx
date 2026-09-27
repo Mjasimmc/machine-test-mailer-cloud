@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Dialog } from '../Dialog/Dialog';
 import { Button } from '../Button/Button';
 
@@ -14,7 +14,7 @@ export interface ConfirmDialogProps {
   isLoading?: boolean;
 }
 
-export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
+export const ConfirmDialog: React.FC<ConfirmDialogProps> = memo(({
   isOpen,
   onClose,
   onConfirm,
@@ -52,4 +52,6 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       <p>{message}</p>
     </Dialog>
   );
-};
+});
+
+ConfirmDialog.displayName = 'ConfirmDialog';

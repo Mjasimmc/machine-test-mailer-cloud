@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import './Dialog.scss';
 
 export interface DialogProps {
@@ -10,7 +10,7 @@ export interface DialogProps {
   className?: string;
 }
 
-export const Dialog: React.FC<DialogProps> = ({
+export const Dialog: React.FC<DialogProps> = memo(({
   isOpen,
   onClose,
   title,
@@ -65,4 +65,6 @@ export const Dialog: React.FC<DialogProps> = ({
       </div>
     </div>
   );
-};
+});
+
+Dialog.displayName = 'Dialog';

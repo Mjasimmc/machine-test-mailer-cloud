@@ -19,7 +19,7 @@ export interface DataTableProps<T> {
   className?: string;
 }
 
-export function DataTable<T>({
+function DataTableInner<T>({
   columns,
   data,
   keyExtractor,
@@ -79,3 +79,5 @@ export function DataTable<T>({
     </div>
   );
 }
+
+export const DataTable = React.memo(DataTableInner) as typeof DataTableInner;
