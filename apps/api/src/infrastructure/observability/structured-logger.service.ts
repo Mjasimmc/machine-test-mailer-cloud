@@ -9,18 +9,22 @@ export class StructuredLoggerService implements LoggerService {
   }
 
   private formatMessage(level: string, message: any, context?: string, ...optionalParams: any[]) {
-    const entry = {
-      timestamp: new Date().toISOString(),
-      level: level.toUpperCase(),
-      context: context || this.context || 'Application',
-      message: typeof message === 'object' ? JSON.stringify(message) : message,
-      params: optionalParams.length > 0 ? optionalParams : undefined,
-    };
+    const timestamp = new Date().toISOString();
+    const resolvedContext = context || this.context || 'Application';
+    const isProd = process.env.NODE_ENV === 'production';
 
-    if (process.env.NODE_ENV === 'production') {
-      return JSON.stringify(entry);
+    if (isProd) {
+      return JSON.stringify({
+        timestamp,
+        level: level.toUpperCase(),
+        context: resolvedContext,
+        message: typeof message === 'object' ? message : String(message),
+        params: optionalParams.length > 0 ? optionalParams : undefined,
+      });
     }
-    return `[${entry.timestamp}] [${entry.level}] [${entry.context}] ${entry.message}`;
+
+    const formattedMessage = typeof message === 'object' ? JSON.stringify(message) : message;
+    return `[${timestamp}] [${level.toUpperCase()}] [${resolvedContext}] ${formattedMessage}`;
   }
 
   log(message: any, context?: string, ...optionalParams: any[]) {

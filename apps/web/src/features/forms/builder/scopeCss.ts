@@ -12,22 +12,23 @@ export function scopeCss(rawCss: string, scopeSelector: string): string {
 
   // Helper to prefix comma-separated selectors
   const prefixSelectors = (selectors: string): string => {
-    return selectors
-      .split(',')
-      .map((sel) => {
-        const s = sel.trim();
-        if (!s) return '';
-        // If the selector targets the root or self container directly
-        if (s === ':root' || s === '&' || s === trimmedScope) {
-          return trimmedScope;
-        }
-        if (s.startsWith('&')) {
-          return `${trimmedScope}${s.slice(1)}`;
-        }
-        return `${trimmedScope} ${s}`;
-      })
-      .filter(Boolean)
-      .join(', ');
+    if (!selectors) return '';
+    const parts = selectors.split(',');
+    let out = '';
+    for (let j = 0; j < parts.length; j++) {
+      const s = parts[j].trim();
+      if (!s) continue;
+      let prefixed: string;
+      if (s === ':root' || s === '&' || s === trimmedScope) {
+        prefixed = trimmedScope;
+      } else if (s.charCodeAt(0) === 38 /* '&' */) {
+        prefixed = `${trimmedScope}${s.slice(1)}`;
+      } else {
+        prefixed = `${trimmedScope} ${s}`;
+      }
+      out = out ? `${out}, ${prefixed}` : prefixed;
+    }
+    return out;
   };
 
   // Process rules token by token

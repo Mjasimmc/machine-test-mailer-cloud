@@ -7,12 +7,9 @@ export class DashboardService {
   constructor(private readonly usersService: UsersService) {}
 
   async getAdminStats(tenantId?: string): Promise<DashboardStats> {
-    const baseFilter: Record<string, any> = { role: Role.USER };
-    if (tenantId) {
-      baseFilter.tenantId = tenantId;
-    }
+    const baseFilter = tenantId ? { role: Role.USER, tenantId } : { role: Role.USER };
 
-    // Only count regular users in SaaS total, or total users
+    // Count user metrics concurrently
     const [totalUsers, activeUsers, suspendedUsers] = await Promise.all([
       this.usersService.count(baseFilter),
       this.usersService.count({ ...baseFilter, status: UserStatus.ACTIVE }),

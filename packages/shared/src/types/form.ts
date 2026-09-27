@@ -349,6 +349,9 @@ export const INTERACTIVE_ELEMENT_TYPES: readonly FormElementType[] = [
   'button',
 ] as const;
 
+const INTERACTIVE_SET = new Set<string>(INTERACTIVE_ELEMENT_TYPES);
+const DATA_FIELD_SET = new Set<string>(INTERACTIVE_ELEMENT_TYPES.filter((t) => t !== 'button'));
+
 export const NON_INTERACTIVE_ELEMENT_TYPES: readonly FormElementType[] = [
   'title',
   'description',
@@ -358,11 +361,11 @@ export const NON_INTERACTIVE_ELEMENT_TYPES: readonly FormElementType[] = [
 ] as const;
 
 export function isInteractiveElement(type: FormElementType): boolean {
-  return INTERACTIVE_ELEMENT_TYPES.includes(type);
+  return INTERACTIVE_SET.has(type);
 }
 
 export function isDataField(type: FormElementType): boolean {
-  return isInteractiveElement(type) && type !== 'button';
+  return DATA_FIELD_SET.has(type);
 }
 
 export function getDataTypeForElementType(type: FormElementType): FieldDataType | undefined {
@@ -734,37 +737,53 @@ export function evaluateConditionGroup(
   }
 
   const { action, matchType, rules } = conditions;
+  const isAny = matchType === 'any';
 
-  const ruleResults = rules.map((rule) => {
+  for (let i = 0; i < rules.length; i++) {
+    const rule = rules[i];
     const rawVal = formValues[rule.fieldIdOrReference];
     const valStr = rawVal !== undefined && rawVal !== null ? String(rawVal) : '';
     const targetStr = rule.value !== undefined && rule.value !== null ? String(rule.value) : '';
 
+    let matched = true;
     switch (rule.operator) {
       case 'equals':
-        return valStr.trim().toLowerCase() === targetStr.trim().toLowerCase();
+        matched = valStr.trim().toLowerCase() === targetStr.trim().toLowerCase();
+        break;
       case 'not_equals':
-        return valStr.trim().toLowerCase() !== targetStr.trim().toLowerCase();
+        matched = valStr.trim().toLowerCase() !== targetStr.trim().toLowerCase();
+        break;
       case 'contains':
-        return valStr.toLowerCase().includes(targetStr.toLowerCase());
+        matched = valStr.toLowerCase().includes(targetStr.toLowerCase());
+        break;
       case 'not_contains':
-        return !valStr.toLowerCase().includes(targetStr.toLowerCase());
+        matched = !valStr.toLowerCase().includes(targetStr.toLowerCase());
+        break;
       case 'greater_than':
-        return Number(valStr) > Number(targetStr);
+        matched = Number(valStr) > Number(targetStr);
+        break;
       case 'less_than':
-        return Number(valStr) < Number(targetStr);
+        matched = Number(valStr) < Number(targetStr);
+        break;
       case 'is_empty':
-        return valStr.trim() === '' || (Array.isArray(rawVal) && rawVal.length === 0);
+        matched = valStr.trim() === '' || (Array.isArray(rawVal) && rawVal.length === 0);
+        break;
       case 'is_not_empty':
-        return valStr.trim() !== '' && (!Array.isArray(rawVal) || rawVal.length > 0);
+        matched = valStr.trim() !== '' && (!Array.isArray(rawVal) || rawVal.length > 0);
+        break;
       default:
-        return true;
+        matched = true;
     }
-  });
 
-  const isMatch =
-    matchType === 'any' ? ruleResults.some(Boolean) : ruleResults.every(Boolean);
+    if (isAny && matched) {
+      return action === 'show';
+    }
+    if (!isAny && !matched) {
+      return action !== 'show';
+    }
+  }
 
+  const isMatch = !isAny; // if 'all', all were matched; if 'any', none were matched
   return action === 'show' ? isMatch : !isMatch;
 }
 

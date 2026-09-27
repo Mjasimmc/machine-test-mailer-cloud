@@ -61,27 +61,38 @@ export async function validateSafeUrl(rawUrl: string): Promise<string> {
 }
 
 function isPrivateIp(ip: string): boolean {
-  const parts = ip.split('.').map(Number);
-  if (parts.length !== 4 || parts.some(isNaN)) {
+  const dot1 = ip.indexOf('.');
+  if (dot1 === -1) return false;
+  const dot2 = ip.indexOf('.', dot1 + 1);
+  if (dot2 === -1) return false;
+  const dot3 = ip.indexOf('.', dot2 + 1);
+  if (dot3 === -1) return false;
+
+  const p0 = Number(ip.substring(0, dot1));
+  const p1 = Number(ip.substring(dot1 + 1, dot2));
+  const p2 = Number(ip.substring(dot2 + 1, dot3));
+  const p3 = Number(ip.substring(dot3 + 1));
+
+  if (isNaN(p0) || isNaN(p1) || isNaN(p2) || isNaN(p3)) {
     return false;
   }
 
   // 0.0.0.0/8
-  if (parts[0] === 0) return true;
+  if (p0 === 0) return true;
   // 10.0.0.0/8
-  if (parts[0] === 10) return true;
+  if (p0 === 10) return true;
   // 127.0.0.0/8
-  if (parts[0] === 127) return true;
+  if (p0 === 127) return true;
   // 169.254.0.0/16 (Link-local & Cloud Metadata 169.254.169.254)
-  if (parts[0] === 169 && parts[1] === 254) return true;
+  if (p0 === 169 && p1 === 254) return true;
   // 172.16.0.0/12
-  if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
+  if (p0 === 172 && p1 >= 16 && p1 <= 31) return true;
   // 192.168.0.0/16
-  if (parts[0] === 192 && parts[1] === 168) return true;
+  if (p0 === 192 && p1 === 168) return true;
   // Carrier-grade NAT 100.64.0.0/10
-  if (parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127) return true;
+  if (p0 === 100 && p1 >= 64 && p1 <= 127) return true;
   // 224.0.0.0/4 (Multicast) & 240.0.0.0/4 (Reserved)
-  if (parts[0] >= 224) return true;
+  if (p0 >= 224) return true;
 
   return false;
 }

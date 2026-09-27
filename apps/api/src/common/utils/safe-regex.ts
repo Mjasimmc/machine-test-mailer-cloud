@@ -29,6 +29,22 @@ export function validateRegexPattern(pattern: string): { isValid: boolean; reaso
   }
 }
 
+const REGEX_CACHE_MAX = 200;
+const compiledRegexCache = new Map<string, RegExp>();
+
+function getCompiledRegex(pattern: string): RegExp {
+  let cached = compiledRegexCache.get(pattern);
+  if (!cached) {
+    if (compiledRegexCache.size >= REGEX_CACHE_MAX) {
+      const firstKey = compiledRegexCache.keys().next().value;
+      if (firstKey) compiledRegexCache.delete(firstKey);
+    }
+    cached = new RegExp(pattern);
+    compiledRegexCache.set(pattern, cached);
+  }
+  return cached;
+}
+
 export function safeRegexTest(pattern: string, input: string, maxInputLength = 1000): SafeRegexResult {
   if (input.length > maxInputLength) {
     return { matches: false, error: `Input exceeds maximum length of ${maxInputLength} characters` };
@@ -40,7 +56,7 @@ export function safeRegexTest(pattern: string, input: string, maxInputLength = 1
   }
 
   try {
-    const regex = new RegExp(pattern);
+    const regex = getCompiledRegex(pattern);
     const matches = regex.test(input);
     return { matches };
   } catch (err: any) {

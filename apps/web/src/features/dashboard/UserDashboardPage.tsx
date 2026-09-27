@@ -136,23 +136,36 @@ export const UserDashboardPage: React.FC = () => {
   // Combined activity feed (Forms & Submissions balanced)
   const activityFeed: CombinedActivityItem[] = useMemo(() => {
     const items: CombinedActivityItem[] = [];
+    const formsMap = new Map(forms.map((f) => [f.id, f]));
 
     // Add submission activities
     Object.entries(dataViews).forEach(([formId, view]) => {
-      const parentForm = forms.find((f) => f.id === formId);
+      const parentForm = formsMap.get(formId);
       const formTitle = parentForm?.name || view.formName || 'Form';
 
       if (view.rows && Array.isArray(view.rows)) {
+        const colLabelMap = new Map<string, string>();
+        if (view.columns) {
+          for (let i = 0; i < view.columns.length; i++) {
+            const col = view.columns[i];
+            const label = col.label || col.id;
+            colLabelMap.set(col.id, label);
+            if (col.reference) {
+              colLabelMap.set(col.reference, label);
+            }
+          }
+        }
+
         view.rows.forEach((row) => {
           const previewEntries: string[] = [];
           const rawData = row.data || {};
           const keys = Object.keys(rawData);
 
-          for (const k of keys) {
+          for (let j = 0; j < keys.length && previewEntries.length < 2; j++) {
+            const k = keys[j];
             const val = rawData[k];
             if (val !== undefined && val !== null && String(val).trim() !== '') {
-              const matchedCol = view.columns.find((c) => c.id === k || c.reference === k);
-              const label = matchedCol?.label || k;
+              const label = colLabelMap.get(k) || k;
               previewEntries.push(`${label}: ${String(val).trim()}`);
             }
           }
@@ -161,7 +174,7 @@ export const UserDashboardPage: React.FC = () => {
             id: `sub-${row.id}`,
             type: 'submission',
             title: `New submission on ${formTitle}`,
-            subtitle: previewEntries.slice(0, 2).join(' · ') || 'Response received',
+            subtitle: previewEntries.join(' · ') || 'Response received',
             formId,
             formName: formTitle,
             timestamp: row.submittedAt,

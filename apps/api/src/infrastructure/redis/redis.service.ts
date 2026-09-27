@@ -9,19 +9,36 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   private isConnected = false;
   private memoryStore = new Map<string, { value: string; expiresAt?: number }>();
 
+  private cleanupTimer: NodeJS.Timeout | null = null;
+
   constructor(private readonly secretsService: SecretsService) {}
 
   async onModuleInit() {
     await this.initRedis();
+    this.cleanupTimer = setInterval(() => this.pruneExpiredMemoryEntries(), 60000);
   }
 
   async onModuleDestroy() {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = null;
+    }
     if (this.client) {
       await this.client.quit().catch(() => {});
       this.client = null;
       this.isConnected = false;
     }
     this.memoryStore.clear();
+  }
+
+  private pruneExpiredMemoryEntries() {
+    if (this.memoryStore.size === 0) return;
+    const now = Date.now();
+    for (const [key, entry] of this.memoryStore.entries()) {
+      if (entry.expiresAt && now > entry.expiresAt) {
+        this.memoryStore.delete(key);
+      }
+    }
   }
 
   private async initRedis() {

@@ -72,7 +72,7 @@ export const FormCanvasHierarchical: React.FC<FormCanvasHierarchicalProps> = ({
   const [draggingElementId, setDraggingElementId] = useState<string | null>(null);
 
   // Reset all drag states
-  const clearDragState = () => {
+  const clearDragState = React.useCallback(() => {
     setActiveDragKind(null);
     setHoveredZoneId(null);
     setHoveredSectionId(null);
@@ -82,20 +82,20 @@ export const FormCanvasHierarchical: React.FC<FormCanvasHierarchicalProps> = ({
     setDraggingSectionIndex(null);
     setDraggingZoneInfo(null);
     setDraggingElementId(null);
-  };
+  }, []);
 
   // Section movement
-  const handleMoveSection = (fromIdx: number, toIdx: number) => {
+  const handleMoveSection = React.useCallback((fromIdx: number, toIdx: number) => {
     if (toIdx < 0 || toIdx >= sections.length || fromIdx === toIdx) return;
     const copy = [...sections];
     const [moved] = copy.splice(fromIdx, 1);
     const target = toIdx > fromIdx ? toIdx - 1 : toIdx;
     copy.splice(target, 0, moved);
     onUpdateSections(copy);
-  };
+  }, [sections, onUpdateSections]);
 
   // Move Zone within or between sections
-  const handleMoveZoneAcrossSections = (
+  const handleMoveZoneAcrossSections = React.useCallback((
     fromSecId: string,
     fromZoneIdx: number,
     toSecId: string,
@@ -124,10 +124,10 @@ export const FormCanvasHierarchical: React.FC<FormCanvasHierarchicalProps> = ({
     }
 
     onUpdateSections(copy);
-  };
+  }, [sections, onUpdateSections]);
 
   // Move Element within or between zones
-  const handleMoveElement = (
+  const handleMoveElement = React.useCallback((
     fromSecId: string,
     fromZoneId: string,
     fromElIdx: number,
@@ -171,7 +171,7 @@ export const FormCanvasHierarchical: React.FC<FormCanvasHierarchicalProps> = ({
     }
 
     onUpdateSections(copy);
-  };
+  }, [sections, onUpdateSections]);
 
   // Section Drag Over Handler
   const handleSectionDragOver = (

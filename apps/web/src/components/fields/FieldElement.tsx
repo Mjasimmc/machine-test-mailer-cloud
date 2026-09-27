@@ -18,7 +18,25 @@ export interface FieldElementProps {
   onButtonClick?: () => void;
 }
 
-export const FieldElement: React.FC<FieldElementProps> = ({
+const regexPatternCache = new Map<string, RegExp>();
+function getCachedRegex(pattern: string): RegExp | null {
+  try {
+    let reg = regexPatternCache.get(pattern);
+    if (!reg) {
+      if (regexPatternCache.size >= 100) {
+        const first = regexPatternCache.keys().next().value;
+        if (first) regexPatternCache.delete(first);
+      }
+      reg = new RegExp(pattern);
+      regexPatternCache.set(pattern, reg);
+    }
+    return reg;
+  } catch {
+    return null;
+  }
+}
+
+export const FieldElement: React.FC<FieldElementProps> = React.memo(({
   element,
   value,
   onChange,
@@ -57,8 +75,8 @@ export const FieldElement: React.FC<FieldElementProps> = ({
     value !== null &&
     String(value).trim() !== ''
   ) {
-    try {
-      const reg = new RegExp(element.validation.pattern);
+    const reg = getCachedRegex(element.validation.pattern);
+    if (reg) {
       if (reg.test(String(value))) {
         validationStatus = 'valid';
         validationMessage = element.validation.successMessage || 'Field is valid';
@@ -66,8 +84,6 @@ export const FieldElement: React.FC<FieldElementProps> = ({
         validationStatus = 'invalid';
         validationMessage = element.validation.errorMessage || 'Field format is invalid';
       }
-    } catch {
-      // ignore regex error
     }
   }
 
@@ -485,4 +501,4 @@ export const FieldElement: React.FC<FieldElementProps> = ({
       )}
     </FormField>
   );
-};
+});

@@ -199,6 +199,18 @@ export class FormsService {
       versionCounts.map((v: any) => [v._id.toString(), v.count]),
     );
 
+    const deployedVersionIds = forms
+      .map((f) => f.deployedVersionId)
+      .filter((id): id is string => Boolean(id));
+
+    const deployedVersions = deployedVersionIds.length > 0
+      ? await this.formVersionModel.find({ _id: { $in: deployedVersionIds } }).exec()
+      : [];
+
+    const deployedVersionMap = new Map<string, FormVersionDocument>(
+      deployedVersions.map((v) => [v._id.toString(), v]),
+    );
+
     const results: FormDto[] = [];
 
     for (const form of forms) {
@@ -208,7 +220,7 @@ export class FormsService {
 
       let deployedVersion: FormVersionDto | null = null;
       if (form.deployedVersionId) {
-        const dep = await this.formVersionModel.findById(form.deployedVersionId).exec();
+        const dep = deployedVersionMap.get(form.deployedVersionId.toString());
         if (dep) {
           const depJson = dep.toJSON();
           deployedVersion = {

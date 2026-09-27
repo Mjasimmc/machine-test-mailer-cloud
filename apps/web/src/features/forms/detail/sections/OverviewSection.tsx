@@ -18,20 +18,29 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
   const [copiedLink, setCopiedLink] = useState(false);
 
   const versions = form.versions || [];
-  // Find currently deployed version
-  const deployedVersion =
-    form.deployedVersion ||
-    versions.find((v) => v.id === form.deployedVersionId || v.isDeployed) ||
-    null;
 
-  // Find latest draft version (sorted highest version number)
-  const sortedVersions = [...versions].sort((a, b) => b.versionNumber - a.versionNumber);
-  const latestVersion = sortedVersions[0] || deployedVersion;
-  const latestDraft = sortedVersions.find((v) => !v.isDeployed && v.id !== form.deployedVersionId) || latestVersion;
+  const { deployedVersion, latestDraft, interactiveFieldsCount } = React.useMemo(() => {
+    // Find currently deployed version
+    const dep =
+      form.deployedVersion ||
+      versions.find((v) => v.id === form.deployedVersionId || v.isDeployed) ||
+      null;
 
-  // Total interactive data fields in current latest version
-  const currentElements = latestVersion?.elements || [];
-  const interactiveFieldsCount = currentElements.filter((el) => isDataField(el.type)).length;
+    // Find latest draft version (sorted highest version number)
+    const sorted = [...versions].sort((a, b) => b.versionNumber - a.versionNumber);
+    const latest = sorted[0] || dep;
+    const draft = sorted.find((v) => !v.isDeployed && v.id !== form.deployedVersionId) || latest;
+
+    // Total interactive data fields in current latest version
+    const currentElements = latest?.elements || [];
+    const fieldCount = currentElements.filter((el) => isDataField(el.type)).length;
+
+    return {
+      deployedVersion: dep,
+      latestDraft: draft,
+      interactiveFieldsCount: fieldCount,
+    };
+  }, [form.deployedVersion, form.deployedVersionId, versions]);
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '—';

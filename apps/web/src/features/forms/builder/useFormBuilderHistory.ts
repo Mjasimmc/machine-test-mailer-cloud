@@ -24,7 +24,7 @@ export function useFormBuilderHistory(initialState: FormSnapshot) {
         last &&
         last.formLayout === nextState.formLayout &&
         last.title === nextState.title &&
-        JSON.stringify(last.sections) === JSON.stringify(nextState.sections)
+        (last.sections === nextState.sections || JSON.stringify(last.sections) === JSON.stringify(nextState.sections))
       ) {
         return prev;
       }

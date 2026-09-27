@@ -321,10 +321,11 @@ export class SubmissionsService {
 
     let subQuery = this.formSubmissionModel
       .find(subFilter)
-      .sort({ createdAt: sortDirection });
+      .sort({ createdAt: sortDirection })
+      .lean();
 
     if (isPaginated) {
-      subQuery = subQuery.skip(skip).limit(limit);
+      subQuery = subQuery.skip(skip).limit(limit) as any;
     }
 
     const submissions = await subQuery.exec();
@@ -444,8 +445,8 @@ export class SubmissionsService {
     }
 
     // Build unified rows with alias resolution
-    const rows: FormDataRowDto[] = submissions.map((sub) => {
-      const subJson = sub.toJSON();
+    const rows: FormDataRowDto[] = submissions.map((sub: any) => {
+      const subId = sub.id || sub._id?.toString();
       const versionNum = versionMap.get(sub.versionId?.toString()) || 1;
       const data = sub.data || {};
 
@@ -468,8 +469,8 @@ export class SubmissionsService {
       }
 
       return {
-        id: subJson.id,
-        submittedAt: subJson.createdAt?.toISOString?.() || new Date().toISOString(),
+        id: subId,
+        submittedAt: sub.createdAt instanceof Date ? sub.createdAt.toISOString() : (sub.createdAt?.toISOString?.() || new Date(sub.createdAt || Date.now()).toISOString()),
         versionNumber: versionNum,
         data: rowData,
       };

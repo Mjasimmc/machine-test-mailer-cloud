@@ -139,9 +139,15 @@ export class IpFirewallService implements OnModuleInit {
         const client = this.redisService.getClient();
         if (client) {
           const ips = await client.smembers(this.blacklistSetKey);
+          if (ips.length === 0) return [];
+
+          const metaKeys = ips.map((ip) => `${this.blacklistMetaPrefix}${ip}`);
+          const rawRecords = await client.mget(metaKeys);
+
           const records: BlockedIpRecord[] = [];
-          for (const ip of ips) {
-            const raw = await client.get(`${this.blacklistMetaPrefix}${ip}`);
+          for (let i = 0; i < ips.length; i++) {
+            const ip = ips[i];
+            const raw = rawRecords[i];
             if (raw) {
               try {
                 records.push(JSON.parse(raw));

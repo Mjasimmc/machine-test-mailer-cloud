@@ -154,14 +154,18 @@ export const FloatingElementsPanel: React.FC<FloatingElementsPanelProps> = ({
     e.dataTransfer.setData('text/plain', item.type);
   };
 
-  const filteredItems = ELEMENT_DEFINITIONS.filter((item) => {
-    const matchesTab = filterTab === 'all' || item.category === filterTab;
-    const matchesSearch =
-      searchQuery.trim() === '' ||
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesTab && matchesSearch;
-  });
+  const filteredItems = React.useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return ELEMENT_DEFINITIONS.filter((item) => {
+      const matchesTab = filterTab === 'all' || item.category === filterTab;
+      if (!matchesTab) return false;
+      if (!q) return true;
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.description.toLowerCase().includes(q)
+      );
+    });
+  }, [filterTab, searchQuery]);
 
   return (
     <FloatingPanel

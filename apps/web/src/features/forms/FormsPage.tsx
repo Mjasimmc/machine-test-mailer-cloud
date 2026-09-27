@@ -81,7 +81,7 @@ export const FormsPage: React.FC = () => {
     }, 2000);
   };
 
-  const columns: Column<FormDto>[] = [
+  const columns: Column<FormDto>[] = React.useMemo(() => [
     {
       key: 'name',
       header: 'Form Name',
@@ -216,7 +216,7 @@ export const FormsPage: React.FC = () => {
         </div>
       ),
     },
-  ];
+  ], [copiedPublicId, navigate]);
 
   return (
     <ContentContainer>

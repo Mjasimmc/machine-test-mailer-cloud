@@ -51,34 +51,50 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
   };
 
+  const rafRef = useRef<number | null>(null);
+
   // Drag move
   const handlePointerMove = useCallback(
     (e: PointerEvent) => {
       if (!isDragging) return;
 
-      const panelEl = panelRef.current;
-      const panelWidth = panelEl ? panelEl.offsetWidth : 340;
-      const panelHeight = panelEl ? panelEl.offsetHeight : 400;
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
 
-      // Keep within viewport bounds
-      const minX = 12;
-      const maxX = Math.max(minX, window.innerWidth - panelWidth - 12);
-      const minY = 62; // Below sticky header
-      const maxY = Math.max(minY, window.innerHeight - panelHeight - 64); // Above bottom toolbar
+      const clientX = e.clientX;
+      const clientY = e.clientY;
 
-      let newX = e.clientX - dragOffsetRef.current.x;
-      let newY = e.clientY - dragOffsetRef.current.y;
+      rafRef.current = requestAnimationFrame(() => {
+        const panelEl = panelRef.current;
+        const panelWidth = panelEl ? panelEl.offsetWidth : 340;
+        const panelHeight = panelEl ? panelEl.offsetHeight : 400;
 
-      newX = Math.max(minX, Math.min(newX, maxX));
-      newY = Math.max(minY, Math.min(newY, maxY));
+        // Keep within viewport bounds
+        const minX = 12;
+        const maxX = Math.max(minX, window.innerWidth - panelWidth - 12);
+        const minY = 62; // Below sticky header
+        const maxY = Math.max(minY, window.innerHeight - panelHeight - 64); // Above bottom toolbar
 
-      setPosition({ x: newX, y: newY });
+        let newX = clientX - dragOffsetRef.current.x;
+        let newY = clientY - dragOffsetRef.current.y;
+
+        newX = Math.max(minX, Math.min(newX, maxX));
+        newY = Math.max(minY, Math.min(newY, maxY));
+
+        setPosition({ x: newX, y: newY });
+        rafRef.current = null;
+      });
     },
     [isDragging],
   );
 
   // Drag end
   const handlePointerUp = useCallback(() => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
     if (isDragging) {
       setIsDragging(false);
     }

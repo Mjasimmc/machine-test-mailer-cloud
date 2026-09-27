@@ -20,10 +20,12 @@ export class RuntimeService {
   ) {}
 
   async getPublicForm(publicId: string): Promise<RuntimeFormResult> {
-    const form = await this.formModel.findOne({ publicId }).exec();
+    const form = await this.formModel.findOne({ publicId }).lean().exec();
     if (!form) {
       throw new NotFoundException(`Public form with ID "${publicId}" not found`);
     }
+
+    const formUpdatedDate = form.updatedAt ? new Date(form.updatedAt) : new Date();
 
     if (!form.deployedVersionId) {
       const dto: PublicFormDto = {
@@ -35,17 +37,17 @@ export class RuntimeService {
         formLayout: 'column',
         customCss: '',
         isDeployed: false,
-        updatedAt: form.updatedAt ? form.updatedAt.toISOString() : new Date().toISOString(),
+        updatedAt: formUpdatedDate.toISOString(),
       };
       return {
         dto,
         etag: `"undeployed-${form._id}"`,
-        lastModified: form.updatedAt || new Date(),
+        lastModified: formUpdatedDate,
       };
     }
 
     // Isolate public runtime strictly to the immutable deployed version snapshot
-    const deployedVersion = await this.formVersionModel.findById(form.deployedVersionId).exec();
+    const deployedVersion = await this.formVersionModel.findById(form.deployedVersionId).lean().exec();
     if (!deployedVersion) {
       const dto: PublicFormDto = {
         publicId: form.publicId,
@@ -56,12 +58,12 @@ export class RuntimeService {
         formLayout: 'column',
         customCss: '',
         isDeployed: false,
-        updatedAt: form.updatedAt ? form.updatedAt.toISOString() : new Date().toISOString(),
+        updatedAt: formUpdatedDate.toISOString(),
       };
       return {
         dto,
         etag: `"missing-version-${form._id}"`,
-        lastModified: form.updatedAt || new Date(),
+        lastModified: formUpdatedDate,
       };
     }
 

@@ -87,12 +87,20 @@ export const DataSection: React.FC<DataSectionProps> = ({ form }) => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       rows = rows.filter((row) => {
-        const timeMatch = row.submittedAt.toLowerCase().includes(q);
-        const verMatch = row.versionNumber !== undefined && `v${row.versionNumber}`.includes(q);
-        const dataMatch = Object.values(row.data).some((val) =>
-          String(val ?? '').toLowerCase().includes(q),
-        );
-        return timeMatch || verMatch || dataMatch;
+        if (row.submittedAt.toLowerCase().includes(q)) return true;
+        if (row.versionNumber !== undefined && `v${row.versionNumber}`.includes(q)) return true;
+        const d = row.data;
+        if (d) {
+          for (const key in d) {
+            if (Object.prototype.hasOwnProperty.call(d, key)) {
+              const val = d[key];
+              if (val !== null && val !== undefined && String(val).toLowerCase().includes(q)) {
+                return true;
+              }
+            }
+          }
+        }
+        return false;
       });
     }
 
