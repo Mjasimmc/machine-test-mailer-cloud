@@ -8,7 +8,7 @@ export interface AppShellProps {
   className?: string;
 }
 
-export const AppShell: React.FC<AppShellProps> = ({
+const AppShellComponent: React.FC<AppShellProps> = ({
   sidebar,
   header,
   children,
@@ -26,3 +26,7 @@ export const AppShell: React.FC<AppShellProps> = ({
     </div>
   );
 };
+
+export const AppShell = React.memo(AppShellComponent);
+AppShell.displayName = 'AppShell';
+

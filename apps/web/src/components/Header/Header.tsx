@@ -8,7 +8,7 @@ export interface HeaderProps {
   className?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({
+const HeaderComponent: React.FC<HeaderProps> = ({
   title,
   actions,
   children,
@@ -27,3 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+
+export const Header = React.memo(HeaderComponent);
+Header.displayName = 'Header';
+

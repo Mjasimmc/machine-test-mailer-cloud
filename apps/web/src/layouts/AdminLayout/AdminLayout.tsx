@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { AppShell, Sidebar, Header, ProfileTile, Badge } from '../../components';
 
-export const AdminLayout: React.FC = () => {
+const AdminLayoutComponent: React.FC = () => {
   return (
     <AppShell
       sidebar={<Sidebar />}
@@ -21,3 +21,7 @@ export const AdminLayout: React.FC = () => {
     </AppShell>
   );
 };
+
+export const AdminLayout = React.memo(AdminLayoutComponent);
+AdminLayout.displayName = 'AdminLayout';
+

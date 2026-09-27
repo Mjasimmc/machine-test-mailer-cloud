@@ -64,12 +64,12 @@ export const formsService = {
 
   getDataView: async (id: string, query?: GetFormDataQueryDto): Promise<FormDataViewDto> => {
     const params = new URLSearchParams();
-    if (query?.page) params.append('page', query.page.toString());
-    if (query?.limit) params.append('limit', query.limit.toString());
-    if (query?.sortField) params.append('sortField', query.sortField);
-    if (query?.sortDirection) params.append('sortDirection', query.sortDirection);
-    if (query?.versionFilter && query.versionFilter !== 'all') params.append('versionFilter', query.versionFilter);
-    if (query?.search) params.append('search', query.search);
+    if (query?.page) params.set('page', query.page.toString());
+    if (query?.limit) params.set('limit', query.limit.toString());
+    if (query?.sortField) params.set('sortField', query.sortField);
+    if (query?.sortDirection) params.set('sortDirection', query.sortDirection);
+    if (query?.versionFilter && query.versionFilter !== 'all') params.set('versionFilter', query.versionFilter);
+    if (query?.search?.trim()) params.set('search', query.search.trim());
 
     const queryString = params.toString();
     const url = `/forms/${id}/data${queryString ? `?${queryString}` : ''}`;

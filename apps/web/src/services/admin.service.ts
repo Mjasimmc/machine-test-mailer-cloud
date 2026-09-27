@@ -7,7 +7,8 @@ export const adminService = {
   },
 
   getUsers: async (search?: string): Promise<UserDto[]> => {
-    const query = search ? `?search=${encodeURIComponent(search)}` : '';
+    const trimmed = search?.trim();
+    const query = trimmed ? `?search=${encodeURIComponent(trimmed)}` : '';
     return api.get<UserDto[]>(`/admin/users${query}`);
   },
 

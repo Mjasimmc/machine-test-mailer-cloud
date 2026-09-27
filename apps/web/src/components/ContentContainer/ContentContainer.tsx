@@ -6,7 +6,7 @@ export interface ContentContainerProps extends React.HTMLAttributes<HTMLDivEleme
   children: React.ReactNode;
 }
 
-export const ContentContainer: React.FC<ContentContainerProps> = ({
+const ContentContainerComponent: React.FC<ContentContainerProps> = ({
   size = 'default',
   children,
   className = '',
@@ -26,3 +26,7 @@ export const ContentContainer: React.FC<ContentContainerProps> = ({
     </div>
   );
 };
+
+export const ContentContainer = React.memo(ContentContainerComponent);
+ContentContainer.displayName = 'ContentContainer';
+

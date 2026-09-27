@@ -8,7 +8,7 @@ export interface WorkspaceHeaderProps {
   className?: string;
 }
 
-export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
+const WorkspaceHeaderComponent: React.FC<WorkspaceHeaderProps> = ({
   brandName = 'SaaS Workspace',
   className = '',
 }) => {
@@ -122,3 +122,6 @@ export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
     </header>
   );
 };
+
+export const WorkspaceHeader = React.memo(WorkspaceHeaderComponent);
+WorkspaceHeader.displayName = 'WorkspaceHeader';

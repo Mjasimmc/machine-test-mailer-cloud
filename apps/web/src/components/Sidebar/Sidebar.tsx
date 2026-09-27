@@ -14,7 +14,7 @@ export interface SidebarProps {
   className?: string;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
+const SidebarComponent: React.FC<SidebarProps> = ({
   children,
   brandName = 'SaaS Core',
   className = '',
@@ -104,3 +104,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </aside>
   );
 };
+
+export const Sidebar = React.memo(SidebarComponent);
+Sidebar.displayName = 'Sidebar';
