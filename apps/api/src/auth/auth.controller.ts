@@ -51,6 +51,9 @@ export class AuthController {
 
   @Post('register')
   @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @ApiOperation({ summary: 'Register a new tenant user account' })
+  @ApiResponse({ status: 201, description: 'User successfully registered' })
+  @ApiResponse({ status: 409, description: 'Email address already exists' })
   async register(
     @Body() dto: RegisterDto,
     @Req() req: Request,
@@ -69,6 +72,9 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @ApiOperation({ summary: 'Authenticate user with email and password' })
+  @ApiResponse({ status: 200, description: 'User successfully authenticated' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials or suspended account' })
   async login(
     @Body() dto: LoginDto,
     @Req() req: Request,
@@ -87,6 +93,9 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 30, ttl: 60000 } })
+  @ApiOperation({ summary: 'Rotate refresh token and issue new access token' })
+  @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
+  @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
   async refresh(
     @Body() dto: RefreshTokenDto,
     @Req() req: Request,
@@ -105,6 +114,8 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Revoke active refresh token and clear authentication cookie' })
+  @ApiResponse({ status: 200, description: 'Logged out successfully' })
   async logout(
     @Body() dto: Partial<RefreshTokenDto>,
     @Req() req: Request,
@@ -119,6 +130,9 @@ export class AuthController {
   @Post('logout-all')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard, ActiveUserGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Revoke all active sessions and refresh tokens across all devices' })
+  @ApiResponse({ status: 200, description: 'All sessions revoked successfully' })
   async logoutAll(
     @CurrentUser('id') userId: string,
     @CurrentTenant() tenantId: string,
@@ -132,6 +146,10 @@ export class AuthController {
   @Post('change-password')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard, ActiveUserGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Change current account password and invalidate older sessions' })
+  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+  @ApiResponse({ status: 400, description: 'Current password invalid' })
   async changePassword(
     @CurrentUser('id') userId: string,
     @CurrentTenant() tenantId: string,
