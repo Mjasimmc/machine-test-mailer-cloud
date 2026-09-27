@@ -4,7 +4,7 @@ import { useAuth } from '../providers/AuthProvider';
 import { Role } from '@saas/shared';
 import { Spinner } from '../../components/Spinner/Spinner';
 
-export const PublicRoute: React.FC = () => {
+const PublicRouteComponent: React.FC = () => {
   const { user, token, loading } = useAuth();
 
   if (loading) {
@@ -32,3 +32,7 @@ export const PublicRoute: React.FC = () => {
 
   return <Outlet />;
 };
+
+export const PublicRoute = React.memo(PublicRouteComponent);
+PublicRoute.displayName = 'PublicRoute';
+

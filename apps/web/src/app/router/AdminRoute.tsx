@@ -4,7 +4,7 @@ import { useAuth } from '../providers/AuthProvider';
 import { Role, UserStatus } from '@saas/shared';
 import { Spinner } from '../../components/Spinner/Spinner';
 
-export const AdminRoute: React.FC = () => {
+const AdminRouteComponent: React.FC = () => {
   const { user, token, loading } = useAuth();
 
   if (loading) {
@@ -37,3 +37,7 @@ export const AdminRoute: React.FC = () => {
 
   return <Outlet />;
 };
+
+export const AdminRoute = React.memo(AdminRouteComponent);
+AdminRoute.displayName = 'AdminRoute';
+

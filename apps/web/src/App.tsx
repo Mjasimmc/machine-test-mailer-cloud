@@ -4,7 +4,7 @@ import { AuthProvider } from './app/providers/AuthProvider';
 import { SocketProvider } from './app/providers/SocketProvider';
 import { AppRouter } from './app/router/AppRouter';
 
-export const App: React.FC = () => {
+const AppComponent: React.FC = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -16,4 +16,8 @@ export const App: React.FC = () => {
   );
 };
 
+export const App = React.memo(AppComponent);
+App.displayName = 'App';
+
 export default App;
+

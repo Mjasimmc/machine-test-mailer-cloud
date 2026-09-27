@@ -4,7 +4,7 @@ import { useAuth } from '../providers/AuthProvider';
 import { UserStatus } from '@saas/shared';
 import { Spinner } from '../../components/Spinner/Spinner';
 
-export const ProtectedRoute: React.FC = () => {
+const ProtectedRouteComponent: React.FC = () => {
   const { user, token, loading } = useAuth();
 
   if (loading) {
@@ -33,3 +33,7 @@ export const ProtectedRoute: React.FC = () => {
 
   return <Outlet />;
 };
+
+export const ProtectedRoute = React.memo(ProtectedRouteComponent);
+ProtectedRoute.displayName = 'ProtectedRoute';
+

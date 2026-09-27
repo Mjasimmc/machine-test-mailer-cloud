@@ -13,6 +13,7 @@ const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:3000';
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { token, user, handleSuspended } = useAuth();
+  const [socket, setSocket] = React.useState<Socket | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
   const handleSuspendedRef = useRef(handleSuspended);
@@ -29,45 +30,52 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
+        setSocket(null);
       }
       return;
     }
 
-    const socket = io(WS_URL, {
+    const sock = io(WS_URL, {
       auth: { token },
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 5,
     });
 
-    socketRef.current = socket;
+    socketRef.current = sock;
+    setSocket(sock);
 
-    socket.on('connect', () => {
+    sock.on('connect', () => {
       console.log(`[Socket] Connected to real-time gateway for user ${userId}`);
     });
 
     // Handle immediate suspension event
-    socket.on(SOCKET_EVENTS.USER_SUSPENDED, (data: any) => {
+    sock.on(SOCKET_EVENTS.USER_SUSPENDED, (data: any) => {
       console.warn(`[Socket] Received account suspension notification:`, data);
-      socket.disconnect();
+      sock.disconnect();
       socketRef.current = null;
+      setSocket(null);
       handleSuspendedRef.current(userEmailRef.current);
     });
 
-    socket.on('disconnect', (reason) => {
+    sock.on('disconnect', (reason) => {
       console.log(`[Socket] Disconnected:`, reason);
     });
 
     return () => {
-      socket.disconnect();
+      sock.disconnect();
       socketRef.current = null;
+      setSocket(null);
     };
   }, [token, userId, userStatus]);
 
+  const contextValue = React.useMemo(() => ({ socket }), [socket]);
+
   return (
-    <SocketContext.Provider value={{ socket: socketRef.current }}>
+    <SocketContext.Provider value={contextValue}>
       {children}
     </SocketContext.Provider>
   );
 };
 
 export const useSocket = () => useContext(SocketContext);
+

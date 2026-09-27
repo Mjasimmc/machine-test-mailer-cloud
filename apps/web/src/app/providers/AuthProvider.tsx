@@ -114,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [handleSuspended]);
 
-  const login = async (credentials: LoginDto): Promise<AuthResponse> => {
+  const login = useCallback(async (credentials: LoginDto): Promise<AuthResponse> => {
     const res = await authService.login(credentials);
     setToken(res.accessToken);
     setUser(res.user);
@@ -122,9 +122,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('last_user_email', res.user.email);
     }
     return res;
-  };
+  }, []);
 
-  const register = async (data: RegisterDto): Promise<AuthResponse> => {
+  const register = useCallback(async (data: RegisterDto): Promise<AuthResponse> => {
     const res = await authService.register(data);
     setToken(res.accessToken);
     setUser(res.user);
@@ -132,18 +132,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('last_user_email', res.user.email);
     }
     return res;
-  };
+  }, []);
 
-  const updateProfile = async (data: { name?: string; email?: string }): Promise<UserDto> => {
+  const updateProfile = useCallback(async (data: { name?: string; email?: string }): Promise<UserDto> => {
     const updated = await authService.updateProfile(data);
     setUser(updated);
     if (updated.email) {
       localStorage.setItem('last_user_email', updated.email);
     }
     return updated;
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await authService.logout();
     } catch {
@@ -153,21 +153,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(null);
     setUser(null);
     navigate('/login');
-  };
+  }, [navigate]);
+
+  const contextValue = React.useMemo<AuthContextType>(
+    () => ({
+      user,
+      token,
+      loading,
+      login,
+      register,
+      updateProfile,
+      logout,
+      handleSuspended,
+    }),
+    [user, token, loading, login, register, updateProfile, logout, handleSuspended],
+  );
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        loading,
-        login,
-        register,
-        updateProfile,
-        logout,
-        handleSuspended,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

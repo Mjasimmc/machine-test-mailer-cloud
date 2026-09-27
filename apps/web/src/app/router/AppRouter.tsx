@@ -24,7 +24,7 @@ import { Role } from '@saas/shared';
 
 import { Spinner } from '../../components/Spinner/Spinner';
 
-const RootRedirect: React.FC = () => {
+const RootRedirectComponent: React.FC = () => {
   const { user, token, loading } = useAuth();
 
   if (loading) {
@@ -54,7 +54,10 @@ const RootRedirect: React.FC = () => {
   return <Navigate to="/dashboard" replace />;
 };
 
-const RoleAwareLayout: React.FC = () => {
+const RootRedirect = React.memo(RootRedirectComponent);
+RootRedirect.displayName = 'RootRedirect';
+
+const RoleAwareLayoutComponent: React.FC = () => {
   const { user } = useAuth();
   if (user?.role === Role.ADMIN) {
     return <AdminLayout />;
@@ -62,7 +65,10 @@ const RoleAwareLayout: React.FC = () => {
   return <UserLayout />;
 };
 
-export const AppRouter: React.FC = () => {
+const RoleAwareLayout = React.memo(RoleAwareLayoutComponent);
+RoleAwareLayout.displayName = 'RoleAwareLayout';
+
+const AppRouterComponent: React.FC = () => {
   return (
     <Routes>
       {/* Root redirection */}
@@ -118,3 +124,7 @@ export const AppRouter: React.FC = () => {
     </Routes>
   );
 };
+
+export const AppRouter = React.memo(AppRouterComponent);
+AppRouter.displayName = 'AppRouter';
+
