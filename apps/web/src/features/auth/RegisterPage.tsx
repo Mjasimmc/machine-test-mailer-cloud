@@ -11,7 +11,7 @@ import {
   Alert,
 } from '../../components';
 
-export const RegisterPage: React.FC = () => {
+const RegisterPageComponent: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -126,3 +126,6 @@ export const RegisterPage: React.FC = () => {
     </AuthLayout>
   );
 };
+
+export const RegisterPage = React.memo(RegisterPageComponent);
+RegisterPage.displayName = 'RegisterPage';

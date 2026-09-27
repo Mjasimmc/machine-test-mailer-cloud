@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthLayout, AuthCard, Button, Alert } from '../../components';
 
-export const AccountSuspendedPage: React.FC = () => {
+const AccountSuspendedPageComponent: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const navigate = useNavigate();
 
@@ -53,3 +53,6 @@ export const AccountSuspendedPage: React.FC = () => {
     </AuthLayout>
   );
 };
+
+export const AccountSuspendedPage = React.memo(AccountSuspendedPageComponent);
+AccountSuspendedPage.displayName = 'AccountSuspendedPage';

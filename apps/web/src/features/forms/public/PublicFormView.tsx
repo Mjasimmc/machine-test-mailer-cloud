@@ -26,7 +26,7 @@ export interface PublicFormViewProps {
   previewDevice?: 'desktop' | 'tablet' | 'mobile';
 }
 
-export const PublicFormView: React.FC<PublicFormViewProps> = ({
+const PublicFormViewComponent: React.FC<PublicFormViewProps> = ({
   formLayout = 'column',
   sections = [],
   elements = [],
@@ -215,3 +215,6 @@ export const PublicFormView: React.FC<PublicFormViewProps> = ({
     </div>
   );
 };
+
+export const PublicFormView = React.memo(PublicFormViewComponent);
+PublicFormView.displayName = 'PublicFormView';

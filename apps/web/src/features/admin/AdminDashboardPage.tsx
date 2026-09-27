@@ -9,7 +9,7 @@ import {
   Skeleton,
 } from '../../components';
 
-export const AdminDashboardPage: React.FC = () => {
+const AdminDashboardPageComponent: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -101,3 +101,6 @@ export const AdminDashboardPage: React.FC = () => {
     </ContentContainer>
   );
 };
+
+export const AdminDashboardPage = React.memo(AdminDashboardPageComponent);
+AdminDashboardPage.displayName = 'AdminDashboardPage';

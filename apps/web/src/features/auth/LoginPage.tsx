@@ -12,7 +12,7 @@ import {
   Alert,
 } from '../../components';
 
-export const LoginPage: React.FC = () => {
+const LoginPageComponent: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -112,3 +112,6 @@ export const LoginPage: React.FC = () => {
     </AuthLayout>
   );
 };
+
+export const LoginPage = React.memo(LoginPageComponent);
+LoginPage.displayName = 'LoginPage';

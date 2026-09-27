@@ -12,7 +12,7 @@ import { Spinner, Alert } from '../../components';
 import { PublicFormView } from './public/PublicFormView';
 import './FormPreviewPage.scss';
 
-export const FormPreviewPage: React.FC = () => {
+const FormPreviewPageComponent: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -437,3 +437,6 @@ export const FormPreviewPage: React.FC = () => {
     </div>
   );
 };
+
+export const FormPreviewPage = React.memo(FormPreviewPageComponent);
+FormPreviewPage.displayName = 'FormPreviewPage';

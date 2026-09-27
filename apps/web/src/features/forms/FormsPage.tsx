@@ -17,7 +17,7 @@ import {
   EmptyState,
 } from '../../components';
 
-export const FormsPage: React.FC = () => {
+const FormsPageComponent: React.FC = () => {
   const [forms, setForms] = useState<FormDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -326,3 +326,6 @@ export const FormsPage: React.FC = () => {
     </ContentContainer>
   );
 };
+
+export const FormsPage = React.memo(FormsPageComponent);
+FormsPage.displayName = 'FormsPage';

@@ -48,7 +48,7 @@ const SecurityRow: React.FC<SecurityRowProps> = ({ label, description, action })
 // ─────────────────────────────────────────────────────────────────────────────
 // Main page
 // ─────────────────────────────────────────────────────────────────────────────
-export const ProfilePage: React.FC = () => {
+const ProfilePageComponent: React.FC = () => {
   const { user, updateProfile, logout } = useAuth();
 
   // Edit state
@@ -321,3 +321,6 @@ export const ProfilePage: React.FC = () => {
     </ContentContainer>
   );
 };
+
+export const ProfilePage = React.memo(ProfilePageComponent);
+ProfilePage.displayName = 'ProfilePage';

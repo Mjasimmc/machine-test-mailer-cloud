@@ -15,7 +15,7 @@ import {
   Alert,
 } from '../../components';
 
-export const AdminUsersPage: React.FC = () => {
+const AdminUsersPageComponent: React.FC = () => {
   const [users, setUsers] = useState<UserDto[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -303,3 +303,6 @@ export const AdminUsersPage: React.FC = () => {
     </ContentContainer>
   );
 };
+
+export const AdminUsersPage = React.memo(AdminUsersPageComponent);
+AdminUsersPage.displayName = 'AdminUsersPage';

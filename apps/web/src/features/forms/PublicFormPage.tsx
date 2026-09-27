@@ -16,7 +16,7 @@ import {
 } from '../../components';
 import { PublicFormView } from './public/PublicFormView';
 
-export const PublicFormPage: React.FC = () => {
+const PublicFormPageComponent: React.FC = () => {
   const { publicId } = useParams<{ publicId: string }>();
   const [form, setForm] = useState<PublicFormDto | null>(null);
   const [loading, setLoading] = useState(true);
@@ -294,3 +294,6 @@ export const PublicFormPage: React.FC = () => {
     </AuthLayout>
   );
 };
+
+export const PublicFormPage = React.memo(PublicFormPageComponent);
+PublicFormPage.displayName = 'PublicFormPage';

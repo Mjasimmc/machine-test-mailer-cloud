@@ -4,7 +4,7 @@ import { useAuth } from '../../app/providers/AuthProvider';
 import { Role } from '@saas/shared';
 import { AuthLayout, EmptyState, Button } from '../../components';
 
-export const NotFoundPage: React.FC = () => {
+const NotFoundPageComponent: React.FC = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
 
@@ -42,3 +42,6 @@ export const NotFoundPage: React.FC = () => {
     </AuthLayout>
   );
 };
+
+export const NotFoundPage = React.memo(NotFoundPageComponent);
+NotFoundPage.displayName = 'NotFoundPage';

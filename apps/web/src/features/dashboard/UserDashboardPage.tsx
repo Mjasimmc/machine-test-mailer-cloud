@@ -52,7 +52,7 @@ interface CombinedActivityItem {
   versionNumber?: number;
 }
 
-export const UserDashboardPage: React.FC = () => {
+const UserDashboardPageComponent: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -698,3 +698,6 @@ export const UserDashboardPage: React.FC = () => {
     </ContentContainer>
   );
 };
+
+export const UserDashboardPage = React.memo(UserDashboardPageComponent);
+UserDashboardPage.displayName = 'UserDashboardPage';
