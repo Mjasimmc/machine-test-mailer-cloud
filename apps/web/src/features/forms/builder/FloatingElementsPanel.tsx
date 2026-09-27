@@ -134,7 +134,7 @@ const ELEMENT_DEFINITIONS: ElementDefinition[] = [
   },
 ];
 
-export const FloatingElementsPanel: React.FC<FloatingElementsPanelProps> = ({
+export const FloatingElementsPanel: React.FC<FloatingElementsPanelProps> = React.memo(({
   isOpen,
   onClose,
   onAddElement,
@@ -142,7 +142,7 @@ export const FloatingElementsPanel: React.FC<FloatingElementsPanelProps> = ({
   const [filterTab, setFilterTab] = useState<'all' | 'interactive' | 'display'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleDragStart = (e: React.DragEvent, item: ElementDefinition) => {
+  const handleDragStart = React.useCallback((e: React.DragEvent, item: ElementDefinition) => {
     e.dataTransfer.effectAllowed = 'copy';
     const payload = JSON.stringify({
       kind: 'palette_element',
@@ -152,7 +152,7 @@ export const FloatingElementsPanel: React.FC<FloatingElementsPanelProps> = ({
     });
     e.dataTransfer.setData('application/json', payload);
     e.dataTransfer.setData('text/plain', item.type);
-  };
+  }, []);
 
   const filteredItems = React.useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -257,4 +257,6 @@ export const FloatingElementsPanel: React.FC<FloatingElementsPanelProps> = ({
       </div>
     </FloatingPanel>
   );
-};
+});
+
+FloatingElementsPanel.displayName = 'FloatingElementsPanel';

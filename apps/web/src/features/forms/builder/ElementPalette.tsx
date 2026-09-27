@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { FormElementType, FieldDataType } from '@saas/shared';
 import { Card, CardHeader, CardContent, Badge } from '../../../components';
 
@@ -143,15 +143,15 @@ export interface ElementPaletteProps {
   onAddElement: (type: FormElementType) => void;
 }
 
-export const ElementPalette: React.FC<ElementPaletteProps> = ({ onAddElement }) => {
+export const ElementPalette: React.FC<ElementPaletteProps> = memo(({ onAddElement }) => {
   const [filter, setFilter] = useState<'all' | 'interactive' | 'display'>('all');
 
-  const handleDragStart = React.useCallback((e: React.DragEvent, type: FormElementType) => {
+  const handleDragStart = useCallback((e: React.DragEvent, type: FormElementType) => {
     e.dataTransfer.setData('application/json', JSON.stringify({ action: 'create', type }));
     e.dataTransfer.effectAllowed = 'copy';
   }, []);
 
-  const filteredItems = React.useMemo(() => {
+  const filteredItems = useMemo(() => {
     return PALETTE_ITEMS.filter(
       (item) => filter === 'all' || item.category === filter,
     );
@@ -271,14 +271,6 @@ export const ElementPalette: React.FC<ElementPaletteProps> = ({ onAddElement }) 
                 transition: 'all var(--transition-fast)',
                 userSelect: 'none',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-primary)';
-                e.currentTarget.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-border)';
-                e.currentTarget.style.transform = 'none';
-              }}
               title={`Drag or click to add ${item.title}`}
             >
               <span className="material-icon" style={{ fontSize: '20px', color: 'var(--color-primary)' }}>
@@ -343,4 +335,6 @@ export const ElementPalette: React.FC<ElementPaletteProps> = ({ onAddElement }) 
       </CardContent>
     </Card>
   );
-};
+});
+
+ElementPalette.displayName = 'ElementPalette';

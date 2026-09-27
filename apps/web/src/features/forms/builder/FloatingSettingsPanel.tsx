@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { FormDto } from '@saas/shared';
 import { FloatingPanel } from './FloatingPanel';
 import './FloatingSettingsPanel.scss';
@@ -12,7 +12,7 @@ export interface FloatingSettingsPanelProps {
   onNavigateToSubmissions: () => void;
 }
 
-export const FloatingSettingsPanel: React.FC<FloatingSettingsPanelProps> = ({
+export const FloatingSettingsPanel: React.FC<FloatingSettingsPanelProps> = memo(({
   isOpen,
   onClose,
   form,
@@ -22,13 +22,14 @@ export const FloatingSettingsPanel: React.FC<FloatingSettingsPanelProps> = ({
 }) => {
   const [copiedLink, setCopiedLink] = useState(false);
 
-  const copyPublicUrl = () => {
+  const copyPublicUrl = useCallback(() => {
     if (!form.publicId) return;
     const url = `${window.location.origin}/f/${form.publicId}`;
     navigator.clipboard.writeText(url);
     setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
-  };
+    const t = window.setTimeout(() => setCopiedLink(false), 2000);
+    return () => window.clearTimeout(t);
+  }, [form.publicId]);
 
   const deployedVersion = form.deployedVersion;
 
@@ -39,7 +40,7 @@ export const FloatingSettingsPanel: React.FC<FloatingSettingsPanelProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       width={400}
-      defaultPosition={{ x: Math.round(window.innerWidth / 2 - 200), y: window.innerHeight - 560 }}
+      defaultPosition={{ x: Math.max(16, Math.round(window.innerWidth / 2 - 200)), y: window.innerHeight - 560 }}
     >
       <div className="settings-panel-content">
         {/* Form Identity */}
@@ -118,4 +119,6 @@ export const FloatingSettingsPanel: React.FC<FloatingSettingsPanelProps> = ({
       </div>
     </FloatingPanel>
   );
-};
+});
+
+FloatingSettingsPanel.displayName = 'FloatingSettingsPanel';

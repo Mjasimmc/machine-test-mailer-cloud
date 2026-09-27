@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
 import './FloatingPanel.scss';
 
 export interface FloatingPanelProps {
@@ -14,7 +14,7 @@ export interface FloatingPanelProps {
   headerExtra?: React.ReactNode;
 }
 
-export const FloatingPanel: React.FC<FloatingPanelProps> = ({
+export const FloatingPanel: React.FC<FloatingPanelProps> = memo(({
   title,
   icon,
   isOpen,
@@ -37,9 +37,10 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const panelRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
 
   // Drag start
-  const handlePointerDown = (e: React.PointerEvent) => {
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
     // Only drag from header, ignore buttons inside header
     if ((e.target as HTMLElement).closest('.floating-panel__close-btn')) return;
 
@@ -49,9 +50,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       y: e.clientY - position.y,
     };
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
-  };
-
-  const rafRef = useRef<number | null>(null);
+  }, [position.x, position.y]);
 
   // Drag move
   const handlePointerMove = useCallback(
@@ -107,28 +106,39 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       return () => {
         window.removeEventListener('pointermove', handlePointerMove);
         window.removeEventListener('pointerup', handlePointerUp);
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
       };
     }
   }, [isDragging, handlePointerMove, handlePointerUp]);
 
   // Adjust position on window resize to ensure panel stays within screen
   useEffect(() => {
+    let resizeTimer: number;
     const handleResize = () => {
-      setPosition((prev) => {
-        const panelEl = panelRef.current;
-        const panelWidth = panelEl ? panelEl.offsetWidth : 340;
-        const panelHeight = panelEl ? panelEl.offsetHeight : 400;
-        const maxX = Math.max(12, window.innerWidth - panelWidth - 12);
-        const maxY = Math.max(62, window.innerHeight - panelHeight - 64);
-        return {
-          x: Math.min(prev.x, maxX),
-          y: Math.min(prev.y, maxY),
-        };
-      });
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        setPosition((prev) => {
+          const panelEl = panelRef.current;
+          const panelWidth = panelEl ? panelEl.offsetWidth : 340;
+          const panelHeight = panelEl ? panelEl.offsetHeight : 400;
+          const maxX = Math.max(12, window.innerWidth - panelWidth - 12);
+          const maxY = Math.max(62, window.innerHeight - panelHeight - 64);
+          return {
+            x: Math.min(prev.x, maxX),
+            y: Math.min(prev.y, maxY),
+          };
+        });
+      }, 60);
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.clearTimeout(resizeTimer);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   if (!isOpen) return null;
@@ -166,4 +176,6 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       <div className="floating-panel__body">{children}</div>
     </div>
   );
-};
+});
+
+FloatingPanel.displayName = 'FloatingPanel';

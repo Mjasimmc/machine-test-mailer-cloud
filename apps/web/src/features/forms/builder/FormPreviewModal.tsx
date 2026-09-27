@@ -23,7 +23,7 @@ export interface FormPreviewModalProps {
   formId?: string;
 }
 
-export const FormPreviewModal: React.FC<FormPreviewModalProps> = ({
+export const FormPreviewModal: React.FC<FormPreviewModalProps> = React.memo(({
   isOpen,
   onClose,
   formTitle,
@@ -41,26 +41,30 @@ export const FormPreviewModal: React.FC<FormPreviewModalProps> = ({
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [copiedData, setCopiedData] = useState(false);
 
-  const allElements = sections.length > 0 ? extractAllElements(sections) : elements;
-  const dataFields = allElements.filter((el) => isDataField(el.type));
+  const allElements = React.useMemo(() => {
+    return sections.length > 0 ? extractAllElements(sections) : elements;
+  }, [sections, elements]);
 
-  const handleReset = () => {
+  const dataFields = React.useMemo(() => {
+    return allElements.filter((el) => isDataField(el.type));
+  }, [allElements]);
+
+  const handleReset = React.useCallback(() => {
     setTestValues({});
     setErrors({});
     setSubmitted(false);
     setSubmittedData(null);
-  };
+  }, []);
 
-  const handleFieldChange = (key: string, val: any) => {
+  const handleFieldChange = React.useCallback((key: string, val: any) => {
     setTestValues((prev) => ({ ...prev, [key]: val }));
-    if (errors[key]) {
-      setErrors((prev) => {
-        const copy = { ...prev };
-        delete copy[key];
-        return copy;
-      });
-    }
-  };
+    setErrors((prev) => {
+      if (!prev[key]) return prev;
+      const copy = { ...prev };
+      delete copy[key];
+      return copy;
+    });
+  }, []);
 
   const handleTestSubmit = (e: React.FormEvent, formattedData: Record<string, any>) => {
     e.preventDefault();
@@ -376,4 +380,6 @@ export const FormPreviewModal: React.FC<FormPreviewModalProps> = ({
       </div>
     </Dialog>
   );
-};
+});
+
+FormPreviewModal.displayName = 'FormPreviewModal';

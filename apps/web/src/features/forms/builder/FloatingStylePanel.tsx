@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, memo } from 'react';
 import { FloatingPanel } from './FloatingPanel';
 import './FloatingStylePanel.scss';
 
@@ -64,19 +64,19 @@ input:focus, textarea:focus {
   },
 ];
 
-export const FloatingStylePanel: React.FC<FloatingStylePanelProps> = ({
+export const FloatingStylePanel: React.FC<FloatingStylePanelProps> = memo(({
   isOpen,
   onClose,
   customCss,
   onChangeCustomCss,
 }) => {
-  const handleApplySnippet = (snippetCss: string) => {
+  const handleApplySnippet = useCallback((snippetCss: string) => {
     if (!customCss.trim()) {
       onChangeCustomCss(snippetCss.trim());
     } else {
       onChangeCustomCss(`${customCss.trim()}\n\n${snippetCss.trim()}`);
     }
-  };
+  }, [customCss, onChangeCustomCss]);
 
   return (
     <FloatingPanel
@@ -85,7 +85,7 @@ export const FloatingStylePanel: React.FC<FloatingStylePanelProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       width={420}
-      defaultPosition={{ x: Math.round(window.innerWidth / 2 - 210), y: window.innerHeight - 560 }}
+      defaultPosition={{ x: Math.max(16, Math.round(window.innerWidth / 2 - 210)), y: window.innerHeight - 560 }}
     >
       <div className="style-panel-content">
         <div className="style-panel-info">
@@ -143,4 +143,6 @@ export const FloatingStylePanel: React.FC<FloatingStylePanelProps> = ({
       </div>
     </FloatingPanel>
   );
-};
+});
+
+FloatingStylePanel.displayName = 'FloatingStylePanel';

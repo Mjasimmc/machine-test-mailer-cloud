@@ -16,7 +16,7 @@ export interface FormCanvasProps {
   onAddElementType: (type: FormElementType, targetIndex?: number) => void;
 }
 
-export const FormCanvas: React.FC<FormCanvasProps> = ({
+export const FormCanvas: React.FC<FormCanvasProps> = React.memo(({
   elements,
   onChange,
   onAddElementType,
@@ -27,36 +27,36 @@ export const FormCanvas: React.FC<FormCanvasProps> = ({
   const [isPaletteOverCanvas, setIsPaletteOverCanvas] = useState(false);
 
   // Reorder elements
-  const handleMove = (fromIndex: number, toIndex: number) => {
+  const handleMove = React.useCallback((fromIndex: number, toIndex: number) => {
     if (toIndex < 0 || toIndex >= elements.length) return;
     const updated = [...elements];
     const [moved] = updated.splice(fromIndex, 1);
     updated.splice(toIndex, 0, moved);
     onChange(updated);
-  };
+  }, [elements, onChange]);
 
   // Remove element
-  const handleRemove = (id: string) => {
+  const handleRemove = React.useCallback((id: string) => {
     const updated = elements.filter((el) => el.id !== id);
     if (editingElementId === id) {
       setEditingElementId(null);
     }
     onChange(updated);
-  };
+  }, [elements, editingElementId, onChange]);
 
   // Update specific field properties
-  const handleUpdateProperty = (id: string, updates: Partial<FormElement>) => {
+  const handleUpdateProperty = React.useCallback((id: string, updates: Partial<FormElement>) => {
     const updated = elements.map((el) => (el.id === id ? { ...el, ...updates } : el));
     onChange(updated);
-  };
+  }, [elements, onChange]);
 
   // Toggle width (6 vs 12)
-  const handleToggleColSpan = (id: string) => {
+  const handleToggleColSpan = React.useCallback((id: string) => {
     const el = elements.find((e) => e.id === id);
     if (!el) return;
     const nextCol = (el.colSpan || 12) === 12 ? 6 : 12;
     handleUpdateProperty(id, { colSpan: nextCol });
-  };
+  }, [elements, handleUpdateProperty]);
 
   // Canvas Drag & Drop handlers
   const handleCanvasDragOver = (e: React.DragEvent) => {
@@ -430,4 +430,6 @@ export const FormCanvas: React.FC<FormCanvasProps> = ({
       )}
     </div>
   );
-};
+});
+
+FormCanvas.displayName = 'FormCanvas';

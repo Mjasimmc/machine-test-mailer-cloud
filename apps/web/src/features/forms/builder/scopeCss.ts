@@ -1,14 +1,25 @@
 import { sanitizeCustomCss } from '@saas/shared';
 
+const scopedCssCache = new Map<string, string>();
+const MAX_CACHE_SIZE = 150;
+
 /**
  * Safely scope CSS rules to a specific container selector to prevent
  * user-defined custom styles from leaking into the builder UI or other forms.
+ * Features an internal LRU-bounded cache for rapid re-renders.
  */
 export function scopeCss(rawCss: string, scopeSelector: string): string {
   if (!rawCss || !rawCss.trim()) return '';
 
-  const cleanCss = sanitizeCustomCss(rawCss).trim();
   const trimmedScope = scopeSelector.trim();
+  const cacheKey = `${trimmedScope}:::${rawCss}`;
+
+  const cached = scopedCssCache.get(cacheKey);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const cleanCss = sanitizeCustomCss(rawCss).trim();
 
   // Helper to prefix comma-separated selectors
   const prefixSelectors = (selectors: string): string => {
@@ -103,6 +114,12 @@ export function scopeCss(rawCss: string, scopeSelector: string): string {
       result += `${scopedSelector} {\n  ${declarations}\n}\n`;
     }
   }
+
+  if (scopedCssCache.size >= MAX_CACHE_SIZE) {
+    const oldestKey = scopedCssCache.keys().next().value;
+    if (oldestKey) scopedCssCache.delete(oldestKey);
+  }
+  scopedCssCache.set(cacheKey, result);
 
   return result;
 }

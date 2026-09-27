@@ -7,58 +7,91 @@ export interface FormSnapshot {
   title: string;
 }
 
-export function useFormBuilderHistory(initialState: FormSnapshot) {
-  const [history, setHistory] = useState<FormSnapshot[]>([initialState]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+interface HistoryState {
+  past: FormSnapshot[];
+  present: FormSnapshot;
+  future: FormSnapshot[];
+}
 
-  const canUndo = currentIndex > 0;
-  const canRedo = currentIndex < history.length - 1;
+export function useFormBuilderHistory(initialState: FormSnapshot) {
+  const [state, setState] = useState<HistoryState>({
+    past: [],
+    present: initialState,
+    future: [],
+  });
+
+  const canUndo = state.past.length > 0;
+  const canRedo = state.future.length > 0;
 
   const pushState = useCallback((nextState: FormSnapshot) => {
-    setHistory((prev) => {
-      // Discard future states if we were in the middle of history
-      const trimmed = prev.slice(0, currentIndex + 1);
-      // Avoid pushing duplicate identical states
-      const last = trimmed[trimmed.length - 1];
+    setState((prev) => {
+      // Avoid pushing identical state
       if (
-        last &&
-        last.formLayout === nextState.formLayout &&
-        last.title === nextState.title &&
-        (last.sections === nextState.sections || JSON.stringify(last.sections) === JSON.stringify(nextState.sections))
+        prev.present.formLayout === nextState.formLayout &&
+        prev.present.title === nextState.title &&
+        (prev.present.sections === nextState.sections ||
+          JSON.stringify(prev.present.sections) === JSON.stringify(nextState.sections))
       ) {
         return prev;
       }
-      const updated = [...trimmed, nextState];
-      // Limit history depth to 50 states to prevent memory bloat
-      if (updated.length > 50) {
-        updated.shift();
+
+      const newPast = [...prev.past, prev.present];
+      if (newPast.length > 50) {
+        newPast.shift();
       }
-      setCurrentIndex(updated.length - 1);
-      return updated;
+
+      return {
+        past: newPast,
+        present: nextState,
+        future: [],
+      };
     });
-  }, [currentIndex]);
+  }, []);
 
   const undo = useCallback((): FormSnapshot | null => {
-    if (!canUndo) return null;
-    const prevIndex = currentIndex - 1;
-    setCurrentIndex(prevIndex);
-    return history[prevIndex];
-  }, [canUndo, currentIndex, history]);
+    let restored: FormSnapshot | null = null;
+    setState((prev) => {
+      if (prev.past.length === 0) return prev;
+      const previous = prev.past[prev.past.length - 1];
+      const newPast = prev.past.slice(0, prev.past.length - 1);
+      restored = previous;
+
+      return {
+        past: newPast,
+        present: previous,
+        future: [prev.present, ...prev.future],
+      };
+    });
+    return restored;
+  }, []);
 
   const redo = useCallback((): FormSnapshot | null => {
-    if (!canRedo) return null;
-    const nextIndex = currentIndex + 1;
-    setCurrentIndex(nextIndex);
-    return history[nextIndex];
-  }, [canRedo, currentIndex, history]);
+    let next: FormSnapshot | null = null;
+    setState((prev) => {
+      if (prev.future.length === 0) return prev;
+      const nextPresent = prev.future[0];
+      const newFuture = prev.future.slice(1);
+      next = nextPresent;
 
-  const resetHistory = useCallback((state: FormSnapshot) => {
-    setHistory([state]);
-    setCurrentIndex(0);
+      return {
+        past: [...prev.past, prev.present],
+        present: nextPresent,
+        future: newFuture,
+      };
+    });
+    return next;
+  }, []);
+
+  const resetHistory = useCallback((newState: FormSnapshot) => {
+    setState({
+      past: [],
+      present: newState,
+      future: [],
+    });
   }, []);
 
   return {
-    currentState: history[currentIndex] || initialState,
+    currentState: state.present,
     canUndo,
     canRedo,
     pushState,

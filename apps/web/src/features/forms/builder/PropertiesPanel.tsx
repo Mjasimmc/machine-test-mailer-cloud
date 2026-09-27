@@ -84,7 +84,7 @@ const VERTICAL_ALIGNMENTS: { key: VerticalAlignment; label: string; icon: string
   { key: 'end', label: 'Bottom', icon: 'align_vertical_bottom' },
 ];
 
-export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
+export const PropertiesPanel: React.FC<PropertiesPanelProps> = React.memo(({
   selection,
   formLayout,
   onUpdateFormLayout,
@@ -1341,5 +1341,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   }
 
   return null;
-};
+});
+
+PropertiesPanel.displayName = 'PropertiesPanel';
 
