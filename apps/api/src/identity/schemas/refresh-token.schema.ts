@@ -30,3 +30,5 @@ export class RefreshToken {
 export const RefreshTokenSchema = SchemaFactory.createForClass(RefreshToken);
 RefreshTokenSchema.index({ userId: 1, family: 1 });
 RefreshTokenSchema.index({ userId: 1, isRevoked: 1 });
+RefreshTokenSchema.index({ tenantId: 1, userId: 1, isRevoked: 1 });
+
